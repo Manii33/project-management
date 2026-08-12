@@ -44,14 +44,11 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-
-        {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">ProjectHub</h1>
-          <p className="text-gray-400 mt-2 text-sm ">Project Management System</p>
+          <h1 className="text-3xl font-bold text-white">🚀 ProjectHub</h1>
+          <p className="text-gray-400 mt-2 text-sm">Project Management System</p>
         </div>
 
-        {/* Card */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
           <h2 className="text-xl font-semibold text-white mb-1">Create account</h2>
           <p className="text-gray-400 text-sm mb-6">Join ProjectHub today</p>
@@ -62,7 +59,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Full Name</label>
               <input
@@ -96,13 +93,13 @@ export default function RegisterPage() {
             </div>
 
             <button
-              onClick={handleSubmit(onSubmit)}
+              type="submit"
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors mt-2"
             >
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
-          </div>
+          </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{' '}

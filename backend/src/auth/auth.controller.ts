@@ -11,6 +11,8 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { AuthenticatedRequest } from './interfaces/authenticated-request.interface';
+
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -29,11 +31,19 @@ export class AuthController {
     return this.authService.login(dto.email, dto.password);
   }
 
+    @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Logout user' })
+  logout() {
+    return { message: 'Logged out successfully' };
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user' })
-  getMe(@Request() req: any) {
+  getMe(@Request() req: AuthenticatedRequest) {
     return this.authService.getMe(req.user.id);
   }
 }
