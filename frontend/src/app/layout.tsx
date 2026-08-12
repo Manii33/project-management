@@ -1,28 +1,19 @@
-'use client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useState } from 'react';
+import type { Metadata } from 'next';
+import Providers from '@/components/Providers';
 import './globals.css';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(
-    () => new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 60 * 1000,
-          retry: 1,
-        },
-      },
-    })
-  );
+export const metadata: Metadata = {
+  title: 'ProjectHub',
+  description: 'Project Management System',
+};
 
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <QueryClientProvider client={queryClient}>
+        <Providers>
           {children}
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        </Providers>
       </body>
     </html>
   );
