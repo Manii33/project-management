@@ -10,6 +10,7 @@ import {
   Query,
   UseGuards,
   Request,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ProjectsService } from './projects.service';
@@ -33,7 +34,7 @@ export class ProjectsController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create project (Admin only)' })
   create(@Body() dto: CreateProjectDto, @Request() req: AuthenticatedRequest) {
-    return this.projectsService.create(dto, req.user as any);
+    return this.projectsService.create(dto, req.user.id);
   }
 
   @Get()
@@ -44,28 +45,28 @@ export class ProjectsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get project by id' })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.findOne(id);
   }
 
   @Put(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update project (Admin only)' })
-  update(@Param('id') id: string, @Body() dto: UpdateProjectDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProjectDto) {
     return this.projectsService.update(id, dto);
   }
 
   @Patch(':id/archive')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Archive project (Admin only)' })
-  archive(@Param('id') id: string) {
+  archive(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.archive(id);
   }
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete project (Admin only)' })
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.remove(id);
   }
 }

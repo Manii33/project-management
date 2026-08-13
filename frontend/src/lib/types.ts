@@ -1,8 +1,13 @@
+export enum UserRole {
+  ADMIN = 'admin',
+  MEMBER = 'member',
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: UserRole;
 }
 
 export interface AuthResponse {

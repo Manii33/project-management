@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AppLayout from '@/components/layout/AppLayout';
@@ -8,8 +9,10 @@ import api from '@/lib/api';
 import { Project, ProjectStatus, PaginatedResponse } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 
-const inputClass = "w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400";
+const inputClass =
+  'w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400';
 
 const STATUS_COLORS: Record<ProjectStatus, string> = {
   PLANNING: 'bg-yellow-100 text-yellow-700',
@@ -23,6 +26,8 @@ const STATUSES: ProjectStatus[] = ['PLANNING', 'ACTIVE', 'COMPLETED', 'ARCHIVED'
 export default function ProjectsPage() {
   const { isAdmin } = useRole();
   const queryClient = useQueryClient();
+
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -34,9 +39,18 @@ export default function ProjectsPage() {
   const [page, setPage] = useState(1);
   const limit = 5;
 
+<<<<<<< HEAD
   // Fetch projects
   const { data, isLoading, error } = useQuery({
     queryKey: ['projects', filterStatus, page],
+=======
+  const {
+    data: projects,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['projects'],
+>>>>>>> task-3-roles
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filterStatus) params.append('status', filterStatus);
@@ -58,8 +72,18 @@ export default function ProjectsPage() {
   });
 
   const updateMutation = useMutation({
+<<<<<<< HEAD
     mutationFn: ({ id, data }: { id: string; data: { name: string; description: string; status: ProjectStatus } }) =>
       api.put(`/projects/${id}`, data),
+=======
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { name: string; description: string };
+    }) => api.put(`/projects/${id}`, data),
+>>>>>>> task-3-roles
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       resetForm();
@@ -106,7 +130,14 @@ export default function ProjectsPage() {
       return;
     }
     if (editProject) {
+<<<<<<< HEAD
       updateMutation.mutate({ id: editProject.id, data: { name, description, status } });
+=======
+      updateMutation.mutate({
+        id: editProject.id,
+        data: { name, description },
+      });
+>>>>>>> task-3-roles
     } else {
       createMutation.mutate({ name, description, status });
     }
@@ -219,7 +250,9 @@ export default function ProjectsPage() {
               {formError && <ErrorMessage message={formError} />}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Name
+                  </label>
                   <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -228,7 +261,9 @@ export default function ProjectsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -252,8 +287,15 @@ export default function ProjectsPage() {
                 <div className="flex gap-2">
                   <button
                     type="submit"
+<<<<<<< HEAD
                     disabled={createMutation.isPending || updateMutation.isPending}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+=======
+                    disabled={
+                      createMutation.isPending || updateMutation.isPending
+                    }
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+>>>>>>> task-3-roles
                   >
                     {editProject ? 'Update' : 'Create'}
                   </button>
@@ -288,6 +330,7 @@ export default function ProjectsPage() {
 
           {/* Projects List */}
           <div className="space-y-3">
+<<<<<<< HEAD
             {data?.data.map((project) => (
               <div
                 key={project.id}
@@ -307,6 +350,26 @@ export default function ProjectsPage() {
                     )}
                     <p className="text-gray-400 text-xs mt-2">
                       Owner: {project.owner?.name} • {new Date(project.createdAt).toLocaleDateString()}
+=======
+            {projects?.map((project) => (
+              <div
+                key={project.id}
+                className="bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-gray-800">
+                      {project.name}
+                    </h3>
+                    {project.description && (
+                      <p className="text-gray-500 text-sm mt-1">
+                        {project.description}
+                      </p>
+                    )}
+                    <p className="text-gray-400 text-xs mt-2">
+                      Created by {project.createdBy?.name} •{' '}
+                      {new Date(project.createdAt).toLocaleDateString()}
+>>>>>>> task-3-roles
                     </p>
                   </div>
 
@@ -319,6 +382,7 @@ export default function ProjectsPage() {
                         Edit
                       </button>
                       <button
+<<<<<<< HEAD
                         onClick={() => archiveMutation.mutate(project.id)}
                         className="text-sm text-yellow-600 hover:text-yellow-800 px-3 py-1 rounded-lg border border-yellow-200 hover:bg-yellow-50"
                       >
@@ -327,6 +391,13 @@ export default function ProjectsPage() {
                       <button
                         onClick={() => deleteMutation.mutate(project.id)}
                         className="text-sm text-red-600 hover:text-red-800 px-3 py-1 rounded-lg border border-red-200 hover:bg-red-50"
+=======
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmDelete(project.id);
+                        }}
+                        className="text-sm text-red-600 hover:text-red-800 px-3 py-1 rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
+>>>>>>> task-3-roles
                       >
                         Delete
                       </button>
@@ -365,6 +436,20 @@ export default function ProjectsPage() {
             </div>
           )}
         </div>
+
+        <ConfirmModal
+          isOpen={!!confirmDelete}
+          title="Delete Project"
+          message="Are you sure you want to delete this project? This action cannot be undone."
+          confirmLabel="Delete"
+          onConfirm={() => {
+            if (confirmDelete) {
+              deleteMutation.mutate(confirmDelete);
+              setConfirmDelete(null);
+            }
+          }}
+          onCancel={() => setConfirmDelete(null)}
+        />
       </AppLayout>
     </ProtectedRoute>
   );

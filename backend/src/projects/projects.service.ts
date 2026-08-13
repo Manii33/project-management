@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Project } from './project.entity';
+import { Project, ProjectStatus } from './project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryProjectDto } from './dto/query-project.dto';
-import { User } from '../users/user.entity';
 
 @Injectable()
 export class ProjectsService {
@@ -14,35 +13,37 @@ export class ProjectsService {
     private projectsRepository: Repository<Project>,
   ) {}
 
-  async create(dto: CreateProjectDto, user: User): Promise<Project> {
+  async create(dto: CreateProjectDto, userId: string): Promise<Project> {
     const project = this.projectsRepository.create({
-      ...dto,
-      owner: user,
-      createdBy: user,
+      name: dto.name,
+      description: dto.description,
+      status: dto.status,
+      owner: { id: userId } as any,
+      createdBy: { id: userId } as any,
     });
     return this.projectsRepository.save(project);
   }
 
   async findAll(query: QueryProjectDto): Promise<{ data: Project[]; total: number; page: number; limit: number }> {
-  const { status, page = 1, limit = 10 } = query;
+    const { status, page = 1, limit = 10 } = query;
 
-  const qb = this.projectsRepository.createQueryBuilder('project')
-    .leftJoinAndSelect('project.owner', 'owner')
-    .leftJoinAndSelect('project.createdBy', 'createdBy')
-    .orderBy('project.createdAt', 'DESC');
+    const qb = this.projectsRepository.createQueryBuilder('project')
+      .leftJoinAndSelect('project.owner', 'owner')
+      .leftJoinAndSelect('project.createdBy', 'createdBy')
+      .orderBy('project.createdAt', 'DESC');
 
-  if (status) {
-    qb.andWhere('project.status = :status', { status });
+    if (status) {
+      qb.andWhere('project.status = :status', { status });
+    }
+
+    const total = await qb.getCount();
+    const data = await qb
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany();
+
+    return { data, total, page, limit };
   }
-
-  const total = await qb.getCount();
-  const data = await qb
-    .skip((page - 1) * limit)
-    .take(limit)
-    .getMany();
-
-  return { data, total, page, limit };
-}
 
   async findOne(id: string): Promise<Project> {
     const project = await this.projectsRepository.findOne({ where: { id } });
@@ -58,7 +59,7 @@ export class ProjectsService {
 
   async archive(id: string): Promise<Project> {
     const project = await this.findOne(id);
-    project.status = 'ARCHIVED' as any;
+    project.status = ProjectStatus.ARCHIVED;
     return this.projectsRepository.save(project);
   }
 
