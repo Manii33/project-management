@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AppLayout from '@/components/layout/AppLayout';
@@ -8,19 +9,27 @@ import api from '@/lib/api';
 import { Project } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 
-const inputClass = "w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400";
+const inputClass =
+  'w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400';
 
 export default function ProjectsPage() {
   const { isAdmin } = useRole();
   const queryClient = useQueryClient();
+
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [formError, setFormError] = useState('');
 
-  const { data: projects, isLoading, error } = useQuery({
+  const {
+    data: projects,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['projects'],
     queryFn: async () => {
       const res = await api.get<Project[]>('/projects');
@@ -39,8 +48,13 @@ export default function ProjectsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { name: string; description: string } }) =>
-      api.put(`/projects/${id}`, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { name: string; description: string };
+    }) => api.put(`/projects/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       resetForm();
@@ -75,7 +89,10 @@ export default function ProjectsPage() {
       return;
     }
     if (editProject) {
-      updateMutation.mutate({ id: editProject.id, data: { name, description } });
+      updateMutation.mutate({
+        id: editProject.id,
+        data: { name, description },
+      });
     } else {
       createMutation.mutate({ name, description });
     }
@@ -105,7 +122,9 @@ export default function ProjectsPage() {
               {formError && <ErrorMessage message={formError} />}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Name
+                  </label>
                   <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -114,7 +133,9 @@ export default function ProjectsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -126,7 +147,9 @@ export default function ProjectsPage() {
                 <div className="flex gap-2">
                   <button
                     type="submit"
-                    disabled={createMutation.isPending || updateMutation.isPending}
+                    disabled={
+                      createMutation.isPending || updateMutation.isPending
+                    }
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
                   >
                     {editProject ? 'Update' : 'Create'}
@@ -162,15 +185,23 @@ export default function ProjectsPage() {
 
           <div className="space-y-3">
             {projects?.map((project) => (
-              <div key={project.id} className="bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+              <div
+                key={project.id}
+                className="bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
+              >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-800">{project.name}</h3>
+                    <h3 className="font-semibold text-gray-800">
+                      {project.name}
+                    </h3>
                     {project.description && (
-                      <p className="text-gray-500 text-sm mt-1">{project.description}</p>
+                      <p className="text-gray-500 text-sm mt-1">
+                        {project.description}
+                      </p>
                     )}
                     <p className="text-gray-400 text-xs mt-2">
-                      Created by {project.createdBy?.name} • {new Date(project.createdAt).toLocaleDateString()}
+                      Created by {project.createdBy?.name} •{' '}
+                      {new Date(project.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   {isAdmin && (
@@ -182,7 +213,10 @@ export default function ProjectsPage() {
                         Edit
                       </button>
                       <button
-                        onClick={() => deleteMutation.mutate(project.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmDelete(project.id);
+                        }}
                         className="text-sm text-red-600 hover:text-red-800 px-3 py-1 rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
                       >
                         Delete
@@ -194,6 +228,20 @@ export default function ProjectsPage() {
             ))}
           </div>
         </div>
+
+        <ConfirmModal
+          isOpen={!!confirmDelete}
+          title="Delete Project"
+          message="Are you sure you want to delete this project? This action cannot be undone."
+          confirmLabel="Delete"
+          onConfirm={() => {
+            if (confirmDelete) {
+              deleteMutation.mutate(confirmDelete);
+              setConfirmDelete(null);
+            }
+          }}
+          onCancel={() => setConfirmDelete(null)}
+        />
       </AppLayout>
     </ProtectedRoute>
   );
