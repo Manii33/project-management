@@ -4,15 +4,19 @@ import {
   Post,
   Put,
   Delete,
+  Patch,
   Body,
   Param,
+  Query,
   UseGuards,
   Request,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { QueryProjectDto } from './dto/query-project.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -30,32 +34,39 @@ export class ProjectsController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create project (Admin only)' })
   create(@Body() dto: CreateProjectDto, @Request() req: AuthenticatedRequest) {
-    return this.projectsService.create(dto, req.user as any);
+    return this.projectsService.create(dto, req.user.id);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all projects (All users)' })
-  findAll() {
-    return this.projectsService.findAll();
+  @ApiOperation({ summary: 'Get all projects with pagination & filtering' })
+  findAll(@Query() query: QueryProjectDto) {
+    return this.projectsService.findAll(query);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get project by id (All users)' })
-  findOne(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Get project by id' })
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.findOne(id);
   }
 
   @Put(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update project (Admin only)' })
-  update(@Param('id') id: string, @Body() dto: UpdateProjectDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProjectDto) {
     return this.projectsService.update(id, dto);
+  }
+
+  @Patch(':id/archive')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Archive project (Admin only)' })
+  archive(@Param('id', ParseUUIDPipe) id: string) {
+    return this.projectsService.archive(id);
   }
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete project (Admin only)' })
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.remove(id);
   }
 }
