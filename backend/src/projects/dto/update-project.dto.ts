@@ -1,15 +1,20 @@
-import { IsString, IsOptional, MinLength } from 'class-validator';
+import { IsString, IsOptional, MinLength, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ProjectStatus } from '../project.entity';
 
 export class UpdateProjectDto {
-  @ApiProperty({ example: 'Updated Project Name', required: false })
+  @ApiProperty({ example: 'My Project' })
   @IsString()
   @MinLength(3)
-  @IsOptional()
-  name?: string;
+  name: string;
 
-  @ApiProperty({ example: 'Updated description', required: false })
+  @ApiProperty({ example: 'Project description', required: false })
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty({ enum: ProjectStatus, default: ProjectStatus.PLANNING, required: false })
+  @IsEnum(ProjectStatus)
+  @IsOptional()
+  status?: ProjectStatus;
 }
