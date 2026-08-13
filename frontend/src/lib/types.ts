@@ -9,3 +9,13 @@ export interface AuthResponse {
   token: string;
   user: User;
 }
+
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  createdBy: User;
+  createdAt: string;
+  updatedAt: string;
+}
