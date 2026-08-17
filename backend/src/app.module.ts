@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
 import databaseConfig from './config/database.config';
+import { ProjectMembersModule } from './project-members/project-members.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import databaseConfig from './config/database.config';
     UsersModule,
     AuthModule,
     ProjectsModule,
+    ProjectMembersModule,
 
   ],
 })

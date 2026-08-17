@@ -30,6 +30,18 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async findAll() {
+  return this.usersRepository.find({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+    },
+    order: { name: 'ASC' },
+  });
+}
+
   async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { email } });
   }
@@ -38,3 +50,5 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { id } });
   }
 }
+
+

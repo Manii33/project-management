@@ -10,9 +10,12 @@ import { Project, ProjectStatus, PaginatedResponse } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import ConfirmModal from '@/components/ui/ConfirmModal';
+import ProjectMembers from '@/components/ProjectMembers';
+import { useAuth } from '@/context/AuthContext';
 
 const inputClass =
   'w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400';
+
 
 const STATUS_COLORS: Record<ProjectStatus, string> = {
   PLANNING: 'bg-yellow-100 text-yellow-700',
@@ -25,6 +28,7 @@ const STATUSES: ProjectStatus[] = ['PLANNING', 'ACTIVE', 'COMPLETED', 'ARCHIVED'
 
 export default function ProjectsPage() {
   const { isAdmin } = useRole();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
@@ -154,6 +158,11 @@ export default function ProjectsPage() {
                 <p><span className="font-medium text-gray-700">Updated:</span> {new Date(selectedProject.updatedAt).toLocaleDateString()}</p>
               </div>
             </div>
+          <ProjectMembers
+  projectId={selectedProject.id}
+  ownerId={selectedProject.owner?.id}
+  isOwner={user?.id === selectedProject.owner?.id}
+/>
           </div>
         </AppLayout>
       </ProtectedRoute>

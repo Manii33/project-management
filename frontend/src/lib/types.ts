@@ -28,6 +28,12 @@ export interface Project {
   updatedAt: string;
 }
 
+export interface ProjectMember {
+  id: string;
+  user: User;
+  joinedAt: string;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   total: number;
