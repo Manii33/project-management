@@ -6,6 +6,7 @@ import { ProjectMember, User } from '@/lib/types';
 import LoadingSpinner from './ui/LoadingSpinner';
 import ErrorMessage from './ui/ErrorMessage';
 import ConfirmModal from './ui/ConfirmModal';
+import { useRole } from '@/lib/hooks/useRole';
 
 interface Props {
   projectId: string;
@@ -15,6 +16,7 @@ interface Props {
 
 export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
   const queryClient = useQueryClient();
+  const { isAdmin } = useRole();
   const [userId, setUserId] = useState('');
   const [addError, setAddError] = useState('');
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
@@ -28,14 +30,14 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
     },
   });
 
-  // Fetch all users (for adding)
+  // Fetch all users (for adding) — directory is admin only
   const { data: users } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const res = await api.get<User[]>('/users');
       return res.data;
     },
-    enabled: isOwner,
+    enabled: isOwner && isAdmin,
   });
 
   const addMutation = useMutation({
@@ -70,7 +72,7 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
       <h2 className="font-semibold text-gray-700 mb-4">Project Members</h2>
 
       {/* Add Member — Owner Only */}
-      {isOwner && (
+      {isOwner && isAdmin && (
         <div className="mb-5">
           <div className="flex gap-2">
             <select
@@ -98,6 +100,12 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
           </div>
           {addError && <p className="text-red-500 text-xs mt-1">{addError}</p>}
         </div>
+      )}
+
+      {isOwner && !isAdmin && (
+        <p className="text-xs text-gray-400 mb-5">
+          Only admins can browse the user directory to add members.
+        </p>
       )}
 
       {/* Members List */}

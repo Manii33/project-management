@@ -17,6 +17,10 @@ export interface AuthResponse {
 
 export type ProjectStatus = 'PLANNING' | 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
 
+export type IssueStatus = 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE';
+
+export type IssuePriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+
 export interface Project {
   id: string;
   name: string;
@@ -32,6 +36,20 @@ export interface ProjectMember {
   id: string;
   user: User;
   joinedAt: string;
+}
+
+export interface Issue {
+  id: string;
+  title: string;
+  description: string;
+  status: IssueStatus;
+  priority: IssuePriority;
+  dueDate: string | null;
+  project: Project;
+  creator: User;
+  assignee: User | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaginatedResponse<T> {

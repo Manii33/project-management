@@ -29,6 +29,10 @@ export class ProjectMembersService {
     const user = await this.usersService.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
+    if (userId === project.owner.id) {
+      throw new ConflictException('Project owner is already a member');
+    }
+
     const existing = await this.membersRepository.findOne({
       where: { project: { id: projectId }, user: { id: userId } },
     });
@@ -45,12 +49,12 @@ export class ProjectMembersService {
   async removeMember(projectId: string, userId: string, requesterId: string): Promise<void> {
     const project = await this.projectsService.findOne(projectId);
 
-    if (project.owner.id === userId) {
-      throw new ForbiddenException('Project owner cannot be removed');
-    }
-
     if (project.owner.id !== requesterId) {
       throw new ForbiddenException('Only project owner can manage members');
+    }
+
+    if (project.owner.id === userId) {
+      throw new ForbiddenException('Project owner cannot be removed');
     }
 
     const member = await this.membersRepository.findOne({
@@ -65,7 +69,11 @@ export class ProjectMembersService {
   async getMembers(projectId: string): Promise<ProjectMember[]> {
     return this.membersRepository.find({
       where: { project: { id: projectId } },
-      relations: { user: true },
+      select: {
+        id: true,
+        joinedAt: true,
+        user: { id: true, name: true, email: true, role: true },
+      },
       order: { joinedAt: 'ASC' },
     });
   }

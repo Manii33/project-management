@@ -12,6 +12,7 @@ import ErrorMessage from '@/components/ui/ErrorMessage';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import ProjectMembers from '@/components/ProjectMembers';
 import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
 
 const inputClass =
   'w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400';
@@ -134,6 +135,12 @@ export default function ProjectsPage() {
             >
               ← Back to Projects
             </button>
+            <Link
+             href={`/projects/${selectedProject.id}/issues`}
+             className="inline-block mt-3 mb-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+>
+              View Issues →
+            </Link>
             <div className="bg-white border rounded-xl p-6 shadow-sm">
               <div className="flex items-start justify-between mb-4">
                 <div>

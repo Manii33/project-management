@@ -5,8 +5,9 @@ import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
-import databaseConfig from './config/database.config';
 import { ProjectMembersModule } from './project-members/project-members.module';
+import { IssuesModule } from './issues/issues.module';
+import databaseConfig from './config/database.config';
 
 @Module({
   imports: [
@@ -14,7 +15,6 @@ import { ProjectMembersModule } from './project-members/project-members.module';
       isGlobal: true,
       load: [databaseConfig],
     }),
-
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -28,13 +28,12 @@ import { ProjectMembersModule } from './project-members/project-members.module';
         synchronize: true,
       }),
     }),
-
     HealthModule,
     UsersModule,
     AuthModule,
     ProjectsModule,
     ProjectMembersModule,
-
+    IssuesModule,
   ],
 })
 export class AppModule {}
