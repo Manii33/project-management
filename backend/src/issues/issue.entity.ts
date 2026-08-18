@@ -31,6 +31,9 @@ export class Issue {
   @Column()
   title: string;
 
+  @Column({ type: 'int', default: 0 })
+  order: number;
+
   @Column({ nullable: true, type: 'text' })
   description: string;
 
