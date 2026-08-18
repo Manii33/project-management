@@ -58,3 +58,11 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
 }
+
+export interface Comment {
+  id: string;
+  content: string;
+  author: User;
+  createdAt: string;
+  updatedAt: string;
+}

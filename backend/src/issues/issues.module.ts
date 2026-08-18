@@ -11,5 +11,6 @@ import { Project } from '../projects/project.entity';
   imports: [TypeOrmModule.forFeature([Issue, ProjectMember, Project])],
   controllers: [IssuesController, IssuesGlobalController],
   providers: [IssuesService],
+  exports: [IssuesService],
 })
 export class IssuesModule {}
