@@ -40,12 +40,15 @@ export class CommentsService {
     }
   }
 
-  private async findComment(commentId: string) {
+  private async findComment(issueId: string, commentId: string) {
     const comment = await this.commentsRepository.findOne({
       where: { id: commentId },
       relations: { issue: { project: true }, author: true },
     });
     if (!comment) throw new NotFoundException('Comment not found');
+    if (comment.issue.id !== issueId) {
+      throw new NotFoundException('Comment not found for this issue');
+    }
     return comment;
   }
 
@@ -88,8 +91,8 @@ export class CommentsService {
     });
   }
 
-  async update(commentId: string, dto: UpdateCommentDto, userId: string, isAdmin: boolean) {
-    const comment = await this.findComment(commentId);
+  async update(issueId: string, commentId: string, dto: UpdateCommentDto, userId: string, isAdmin: boolean) {
+    const comment = await this.findComment(issueId, commentId);
     await this.requireMember(comment.issue.id, userId);
 
     if (!isAdmin && comment.author.id !== userId) {
@@ -111,8 +114,8 @@ export class CommentsService {
     });
   }
 
-  async remove(commentId: string, userId: string, isAdmin: boolean): Promise<void> {
-    const comment = await this.findComment(commentId);
+  async remove(issueId: string, commentId: string, userId: string, isAdmin: boolean): Promise<void> {
+    const comment = await this.findComment(issueId, commentId);
     await this.requireMember(comment.issue.id, userId);
 
     if (!isAdmin && comment.author.id !== userId) {

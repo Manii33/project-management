@@ -52,7 +52,7 @@ export class CommentsController {
     @Body() dto: UpdateCommentDto,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.commentsService.update(id, dto, req.user.id, req.user.role === UserRole.ADMIN);
+    return this.commentsService.update(issueId, id, dto, req.user.id, req.user.role === UserRole.ADMIN);
   }
 
   @Delete(':id')
@@ -62,6 +62,6 @@ export class CommentsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.commentsService.remove(id, req.user.id, req.user.role === UserRole.ADMIN);
+    return this.commentsService.remove(issueId, id, req.user.id, req.user.role === UserRole.ADMIN);
   }
 }

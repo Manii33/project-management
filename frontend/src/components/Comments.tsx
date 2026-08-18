@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { Comment } from '@/lib/types';
+import { Comment, UserRole } from '@/lib/types';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/lib/hooks/useRole';
 import LoadingSpinner from './ui/LoadingSpinner';
@@ -117,7 +117,7 @@ export default function Comments({ issueId }: { issueId: string }) {
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-medium text-gray-800 text-sm">{c.author?.name}</span>
-                  {isAdmin && (
+                  {c.author?.role === UserRole.ADMIN && (
                     <span className="px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 text-[10px] font-medium uppercase">Admin</span>
                   )}
                   <span className="text-xs text-gray-400">
