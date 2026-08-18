@@ -68,11 +68,12 @@ export class IssuesService {
     const { status, priority, assigneeId, search, page = 1, limit = 10 } = query;
 
     const qb = this.issuesRepository
-      .createQueryBuilder('issue')
-      .leftJoinAndSelect('issue.creator', 'creator')
-      .leftJoinAndSelect('issue.assignee', 'assignee')
-      .where('issue.project = :projectId', { projectId })
-      .orderBy('issue.createdAt', 'DESC');
+  .createQueryBuilder('issue')
+  .leftJoinAndSelect('issue.creator', 'creator')
+  .leftJoinAndSelect('issue.assignee', 'assignee')
+  .where('issue.project = :projectId', { projectId })
+  .orderBy('issue.order', 'ASC')
+  .addOrderBy('issue.createdAt', 'DESC');
 
     if (status) qb.andWhere('issue.status = :status', { status });
     if (priority) qb.andWhere('issue.priority = :priority', { priority });

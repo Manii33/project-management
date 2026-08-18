@@ -44,6 +44,7 @@ export interface Issue {
   description: string;
   status: IssueStatus;
   priority: IssuePriority;
+  order: number;
   dueDate: string | null;
   project: Project;
   creator: User;

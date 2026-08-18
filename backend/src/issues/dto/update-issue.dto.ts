@@ -1,6 +1,7 @@
-import { IsString, IsOptional, IsEnum, IsUUID, IsDateString, MinLength } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsUUID, IsDateString, MinLength, IsInt } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { IssueStatus, IssuePriority } from '../issue.entity';
+
 
 export class UpdateIssueDto {
   @ApiProperty({ required: false })
@@ -33,4 +34,9 @@ export class UpdateIssueDto {
   @IsUUID()
   @IsOptional()
   assigneeId?: string;
+
+  @ApiProperty({ required: false })
+  @IsInt()
+  @IsOptional()
+  order?: number;
 }
