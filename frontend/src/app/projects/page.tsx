@@ -138,9 +138,17 @@ export default function ProjectsPage() {
             <Link
              href={`/projects/${selectedProject.id}/issues`}
              className="inline-block mt-3 mb-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
->
+            >
               View Issues →
             </Link>
+            <Link
+             href={`/projects/${selectedProject.id}/kanban`}
+             className="bg-gray-200 text-gray-700 px-4 py-2 ml-3 rounded-lg text-sm font-medium hover:bg-gray-200"
+            >
+            📋 Kanban Board
+            </Link>
+
+            
             <div className="bg-white border rounded-xl p-6 shadow-sm">
               <div className="flex items-start justify-between mb-4">
                 <div>
