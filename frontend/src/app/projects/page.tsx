@@ -149,7 +149,7 @@ export default function ProjectsPage() {
             </Link>
             <Link
              href={`/projects/${selectedProject.id}/kanban`}
-             className="bg-gray-200 text-gray-700 px-4 py-2 ml-3 rounded-lg text-sm font-medium hover:bg-gray-200"
+             className="bg-gray-200 text-gray-700 mt-3 mb-2 px-4 py-2 ml-3 rounded-lg text-sm font-medium hover:bg-gray-300"
             >
             📋 Kanban Board
             </Link>
