@@ -9,6 +9,7 @@ import { Issue, IssueStatus, IssuePriority, ProjectMember, PaginatedResponse } f
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import ConfirmModal from '@/components/ui/ConfirmModal';
+import Comments from '@/components/Comments';
 import { useAuth } from '@/context/AuthContext';
 
 const inputClass = 'w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400';
@@ -192,6 +193,8 @@ export default function IssuesPage() {
                 <p><span className="font-medium text-gray-700">Created:</span> {new Date(selectedIssue.createdAt).toLocaleDateString()}</p>
               </div>
             </div>
+
+            <Comments issueId={selectedIssue.id} />
           </div>
           <ConfirmModal
             isOpen={!!confirmDelete}

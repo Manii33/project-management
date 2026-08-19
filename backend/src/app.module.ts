@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ProjectMembersModule } from './project-members/project-members.module';
 import { IssuesModule } from './issues/issues.module';
+import { CommentsModule } from './comments/comments.module';
 import databaseConfig from './config/database.config';
 
 @Module({
@@ -34,6 +35,7 @@ import databaseConfig from './config/database.config';
     ProjectsModule,
     ProjectMembersModule,
     IssuesModule,
+    CommentsModule,
   ],
 })
 export class AppModule {}

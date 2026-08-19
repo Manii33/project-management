@@ -23,7 +23,7 @@ export class IssuesService {
     private projectsRepository: Repository<Project>,
   ) {}
 
-  private async isMember(projectId: string, userId: string): Promise<boolean> {
+  async isMember(projectId: string, userId: string): Promise<boolean> {
     // Owner is always a member
     const project = await this.projectsRepository.findOne({
       where: { id: projectId },
