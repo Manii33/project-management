@@ -136,6 +136,12 @@ export default function ProjectsPage() {
               ← Back to Projects
             </button>
             <Link
+             href={`/projects/${selectedProject.id}/dashboard`}
+             className="bg-gray-800 text-white mt-3 mb-2 px-4 py-2 mr-3 rounded-lg text-sm font-medium hover:bg-gray-700"
+            >
+            📊 Dashboard
+            </Link>
+            <Link
              href={`/projects/${selectedProject.id}/issues`}
              className="inline-block mt-3 mb-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
             >
