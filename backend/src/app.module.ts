@@ -19,15 +19,24 @@ import { DashboardModule } from './dashboard/dashboard.module';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        url: config.get<string>('DATABASE_URL'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
-        ssl: {
-          rejectUnauthorized: false,
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const dbUrl = config.get<string>('DATABASE_URL');
+        
+        return {
+          type: 'postgres',
+          url: dbUrl,
+          // Fallback variables jab aap local database chalayein
+          host: config.get<string>('DB_HOST') || 'localhost',
+          port: config.get<number>('DB_PORT') || 5432,
+          username: config.get<string>('DB_USERNAME') || 'postgres',
+          password: config.get<string>('DB_PASSWORD'),
+          database: config.get<string>('DB_DATABASE'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: true,
+          // SSL sirf tab chalega jab Railway ka DATABASE_URL milega
+          ssl: dbUrl ? { rejectUnauthorized: false } : false,
+        };
+      },
     }),
     HealthModule,
     UsersModule,
