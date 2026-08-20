@@ -4,14 +4,36 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, ILike, FindOptionsWhere, FindManyOptions } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Issue } from './issue.entity';
 import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateIssueDto } from './dto/update-issue.dto';
 import { QueryIssueDto } from './dto/query-issue.dto';
 import { ProjectMember } from '../project-members/project-member.entity';
 import { Project } from '../projects/project.entity';
-import { SAFE_USER_SELECT } from '../common/safe-user-select';
+
+const ISSUE_WITH_PROJECT_SELECT = [
+  'issue.id',
+  'issue.title',
+  'issue.order',
+  'issue.description',
+  'issue.status',
+  'issue.priority',
+  'issue.dueDate',
+  'issue.createdAt',
+  'issue.updatedAt',
+  'project.id',
+  'project.name',
+  'project.status',
+  'creator.id',
+  'creator.name',
+  'creator.email',
+  'creator.role',
+  'assignee.id',
+  'assignee.name',
+  'assignee.email',
+  'assignee.role',
+];
 
 @Injectable()
 export class IssuesService {
@@ -121,79 +143,39 @@ export class IssuesService {
     const projectIds = memberships.map((m) => m.project.id);
     if (projectIds.length === 0) return { data: [], total: 0, page, limit };
 
-    const buildWhere = (): FindOptionsWhere<Issue> => {
-      const where: FindOptionsWhere<Issue> = { project: { id: In(projectIds) } };
-      if (status) where.status = status;
-      if (priority) where.priority = priority;
-      if (assigneeId) where.assignee = { id: assigneeId };
-      return where;
-    };
+    const qb = this.issuesRepository
+      .createQueryBuilder('issue')
+      .leftJoinAndSelect('issue.project', 'project')
+      .leftJoinAndSelect('issue.creator', 'creator')
+      .leftJoinAndSelect('issue.assignee', 'assignee')
+      .select(ISSUE_WITH_PROJECT_SELECT)
+      .where('issue.project IN (:...projectIds)', { projectIds })
+      .orderBy('issue.createdAt', 'DESC');
 
-    const base: FindManyOptions<Issue> = {
-      select: {
-        id: true,
-        title: true,
-        order: true,
-        description: true,
-        status: true,
-        priority: true,
-        dueDate: true,
-        createdAt: true,
-        updatedAt: true,
-        project: { id: true, name: true },
-        creator: SAFE_USER_SELECT,
-        assignee: SAFE_USER_SELECT,
-      },
-      order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
-    };
-
-    let data: Issue[];
-    let total: number;
+    if (status) qb.andWhere('issue.status = :status', { status });
+    if (priority) qb.andWhere('issue.priority = :priority', { priority });
+    if (assigneeId) qb.andWhere('assignee.id = :assigneeId', { assigneeId });
     if (search) {
-      const where = buildWhere();
-      const pattern = `%${search}%`;
-      const addAssigneeSearch = (w: FindOptionsWhere<Issue>): FindOptionsWhere<Issue> => ({
-        ...w,
-        assignee: { ...(w.assignee as object), name: ILike(pattern) },
-      });
-      [data, total] = await this.issuesRepository.findAndCount({
-        ...base,
-        where: [
-          { ...where, title: ILike(pattern) },
-          { ...where, description: ILike(pattern) },
-          addAssigneeSearch(where),
-        ],
-      });
-    } else {
-      [data, total] = await this.issuesRepository.findAndCount({
-        ...base,
-        where: buildWhere(),
-      });
+      qb.andWhere(
+        '(LOWER(issue.title) LIKE LOWER(:search) OR LOWER(issue.description) LIKE LOWER(:search) OR LOWER(assignee.name) LIKE LOWER(:search))',
+        { search: `%${search}%` },
+      );
     }
+
+    const [data, total] = await qb.skip((page - 1) * limit).take(limit).getManyAndCount();
 
     return { data, total, page, limit };
   }
 
   async findOne(id: string, userId: string): Promise<Issue> {
-    const issue = await this.issuesRepository.findOne({
-      where: { id },
-      select: {
-        id: true,
-        title: true,
-        order: true,
-        description: true,
-        status: true,
-        priority: true,
-        dueDate: true,
-        createdAt: true,
-        updatedAt: true,
-        project: { id: true },
-        creator: SAFE_USER_SELECT,
-        assignee: SAFE_USER_SELECT,
-      },
-    });
+    const issue = await this.issuesRepository
+      .createQueryBuilder('issue')
+      .leftJoinAndSelect('issue.project', 'project')
+      .leftJoinAndSelect('issue.creator', 'creator')
+      .leftJoinAndSelect('issue.assignee', 'assignee')
+      .select(ISSUE_WITH_PROJECT_SELECT)
+      .where('issue.id = :id', { id })
+      .getOne();
     if (!issue) throw new NotFoundException('Issue not found');
 
     const member = await this.isMember(issue.project.id, userId);
