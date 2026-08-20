@@ -9,6 +9,7 @@ import { ProjectMembersModule } from './project-members/project-members.module';
 import { IssuesModule } from './issues/issues.module';
 import { CommentsModule } from './comments/comments.module';
 import databaseConfig from './config/database.config';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -18,16 +19,24 @@ import databaseConfig from './config/database.config';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('database.host'),
-        port: config.get<number>('database.port'),
-        username: config.get('database.username'),
-        password: config.get('database.password'),
-        database: config.get('database.database'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
-      }),
+      useFactory: (config: ConfigService) => {
+        const dbUrl = config.get<string>('DATABASE_URL');
+        
+        return {
+          type: 'postgres',
+          url: dbUrl,
+          // Fallback variables jab aap local database chalayein
+          host: config.get<string>('DB_HOST') || 'localhost',
+          port: config.get<number>('DB_PORT') || 5432,
+          username: config.get<string>('DB_USERNAME') || 'postgres',
+          password: config.get<string>('DB_PASSWORD'),
+          database: config.get<string>('DB_DATABASE'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: true,
+          // SSL sirf tab chalega jab Railway ka DATABASE_URL milega
+          ssl: dbUrl ? { rejectUnauthorized: false } : false,
+        };
+      },
     }),
     HealthModule,
     UsersModule,
@@ -36,6 +45,7 @@ import databaseConfig from './config/database.config';
     ProjectMembersModule,
     IssuesModule,
     CommentsModule,
+    DashboardModule,
   ],
 })
 export class AppModule {}
