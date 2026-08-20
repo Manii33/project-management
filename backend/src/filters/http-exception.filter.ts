@@ -37,7 +37,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }
     } else if (exception instanceof Error) {
       // Database errors
-      const dbError = exception as Record<string, unknown>;
+      const dbError = exception as unknown as Record<string, unknown>;
       if (dbError.code === '23505') {
         status = HttpStatus.CONFLICT;
         message = 'Duplicate entry — resource already exists';
