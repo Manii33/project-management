@@ -80,7 +80,7 @@ export class IssuesService {
     if (assigneeId) qb.andWhere('assignee.id = :assigneeId', { assigneeId });
     if (search) {
       qb.andWhere(
-        '(LOWER(issue.title) LIKE LOWER(:search) OR LOWER(issue.description) LIKE LOWER(:search))',
+        '(LOWER(issue.title) LIKE LOWER(:search) OR LOWER(issue.description) LIKE LOWER(:search) OR LOWER(assignee.name) LIKE LOWER(:search))',
         { search: `%${search}%` },
       );
     }
@@ -121,11 +121,16 @@ export class IssuesService {
     if (search) {
       const where = buildWhere();
       const pattern = `%${search}%`;
+      const addAssigneeSearch = (w: FindOptionsWhere<Issue>): FindOptionsWhere<Issue> => ({
+        ...w,
+        assignee: { ...(w.assignee as object), name: ILike(pattern) },
+      });
       [data, total] = await this.issuesRepository.findAndCount({
         ...base,
         where: [
           { ...where, title: ILike(pattern) },
           { ...where, description: ILike(pattern) },
+          addAssigneeSearch(where),
         ],
       });
     } else {
