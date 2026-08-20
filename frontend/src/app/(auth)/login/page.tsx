@@ -8,6 +8,8 @@ import { z } from 'zod';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { AuthResponse } from '@/lib/types';
+import { getErrorMessage } from '@/lib/api';
+
 
 const loginSchema = z.object({
   email: z.string().email('Valid email required'),
@@ -27,18 +29,18 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginForm) => {
-    setLoading(true);
-    setError('');
-    try {
-      const res = await api.post<AuthResponse>('/auth/login', data);
-      login(res.data.token, res.data.user);
-      router.push('/');
-    } catch {
-      setError('Invalid email or password');
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  setError('');
+  try {
+    const res = await api.post<AuthResponse>('/auth/login', data);
+    login(res.data.token, res.data.user);
+    router.push('/');
+  } catch (error) {
+    setError(getErrorMessage(error));
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
