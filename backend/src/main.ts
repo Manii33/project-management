@@ -7,8 +7,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
+  origin: ['http://localhost:3000', 'https://project-management-topaz-one.vercel.app'],
+});
 
       const isAllowed =
         origin.includes('localhost') ||

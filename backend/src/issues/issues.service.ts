@@ -12,17 +12,20 @@ import { QueryIssueDto } from './dto/query-issue.dto';
 import { ProjectMember } from '../project-members/project-member.entity';
 import { Project } from '../projects/project.entity';
 import { SAFE_USER_SELECT } from '../common/safe-user-select';
+import { ActivityService } from '../activity/activity.service';
+import { ActivityAction } from '../activity/activity.entity';
 
 @Injectable()
 export class IssuesService {
   constructor(
-    @InjectRepository(Issue)
-    private issuesRepository: Repository<Issue>,
-    @InjectRepository(ProjectMember)
-    private membersRepository: Repository<ProjectMember>,
-    @InjectRepository(Project)
-    private projectsRepository: Repository<Project>,
-  ) {}
+  @InjectRepository(Issue)
+  private issuesRepository: Repository<Issue>,
+  @InjectRepository(ProjectMember)
+  private membersRepository: Repository<ProjectMember>,
+  @InjectRepository(Project)
+  private projectsRepository: Repository<Project>,
+  private activityService: ActivityService,
+) {}
 
   async isMember(projectId: string, userId: string): Promise<boolean> {
     // Owner is always a member
@@ -224,6 +227,14 @@ export class IssuesService {
     if (issue.creator.id !== userId) {
       throw new ForbiddenException('Only issue creator can delete it');
     }
+
+     await this.activityService.log(
+      ActivityAction.ISSUE_DELETED,
+      userId,
+      issue.project.id,
+      { issueTitle: issue.title, issueId: id },
+    );
+
     await this.issuesRepository.remove(issue);
   }
 }
