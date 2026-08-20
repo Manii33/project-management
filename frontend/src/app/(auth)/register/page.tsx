@@ -29,7 +29,7 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
- const onSubmit = async (data: LoginForm) => {
+ const onSubmit = async (data: RegisterForm) => {
   setLoading(true);
   setError('');
   try {
