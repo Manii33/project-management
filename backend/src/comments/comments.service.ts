@@ -6,13 +6,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Issue } from '../issues/issue.entity';
 import { IssuesService } from '../issues/issues.service';
-
-const SAFE_USER_SELECT = {
-  id: true,
-  name: true,
-  email: true,
-  role: true,
-} as const;
+import { SAFE_USER_SELECT } from '../common/safe-user-select';
 
 @Injectable()
 export class CommentsService {

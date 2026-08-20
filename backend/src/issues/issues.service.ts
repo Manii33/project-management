@@ -11,6 +11,7 @@ import { UpdateIssueDto } from './dto/update-issue.dto';
 import { QueryIssueDto } from './dto/query-issue.dto';
 import { ProjectMember } from '../project-members/project-member.entity';
 import { Project } from '../projects/project.entity';
+import { SAFE_USER_SELECT } from '../common/safe-user-select';
 
 @Injectable()
 export class IssuesService {
@@ -71,6 +72,25 @@ export class IssuesService {
   .createQueryBuilder('issue')
   .leftJoinAndSelect('issue.creator', 'creator')
   .leftJoinAndSelect('issue.assignee', 'assignee')
+  .select([
+    'issue.id',
+    'issue.title',
+    'issue.order',
+    'issue.description',
+    'issue.status',
+    'issue.priority',
+    'issue.dueDate',
+    'issue.createdAt',
+    'issue.updatedAt',
+    'creator.id',
+    'creator.name',
+    'creator.email',
+    'creator.role',
+    'assignee.id',
+    'assignee.name',
+    'assignee.email',
+    'assignee.role',
+  ])
   .where('issue.project = :projectId', { projectId })
   .orderBy('issue.order', 'ASC')
   .addOrderBy('issue.createdAt', 'DESC');
@@ -110,7 +130,20 @@ export class IssuesService {
     };
 
     const base: FindManyOptions<Issue> = {
-      relations: { project: true, creator: true, assignee: true },
+      select: {
+        id: true,
+        title: true,
+        order: true,
+        description: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        createdAt: true,
+        updatedAt: true,
+        project: { id: true, name: true },
+        creator: SAFE_USER_SELECT,
+        assignee: SAFE_USER_SELECT,
+      },
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
@@ -141,7 +174,20 @@ export class IssuesService {
   async findOne(id: string, userId: string): Promise<Issue> {
     const issue = await this.issuesRepository.findOne({
       where: { id },
-      relations: { project: true, creator: true, assignee: true },
+      select: {
+        id: true,
+        title: true,
+        order: true,
+        description: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        createdAt: true,
+        updatedAt: true,
+        project: { id: true },
+        creator: SAFE_USER_SELECT,
+        assignee: SAFE_USER_SELECT,
+      },
     });
     if (!issue) throw new NotFoundException('Issue not found');
 

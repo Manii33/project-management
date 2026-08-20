@@ -1,19 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Issue, IssueStatus } from '../issues/issue.entity';
-import { ProjectMember } from '../project-members/project-member.entity';
+import { IssuesService } from '../issues/issues.service';
+import { SAFE_USER_SELECT } from '../common/safe-user-select';
 
 @Injectable()
 export class DashboardService {
   constructor(
     @InjectRepository(Issue)
     private issuesRepository: Repository<Issue>,
-    @InjectRepository(ProjectMember)
-    private membersRepository: Repository<ProjectMember>,
+    private issuesService: IssuesService,
   ) {}
 
-  async getProjectStats(projectId: string) {
+  async getProjectStats(projectId: string, userId: string) {
+    if (!(await this.issuesService.isMember(projectId, userId))) {
+      throw new ForbiddenException('Only project members can view the dashboard');
+    }
+
     const now = new Date();
 
     // Total issues
@@ -67,7 +71,18 @@ export class DashboardService {
     // Recent activity
     const recentIssues = await this.issuesRepository.find({
       where: { project: { id: projectId } },
-      relations: { creator: true, assignee: true },
+      select: {
+        id: true,
+        title: true,
+        order: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        createdAt: true,
+        updatedAt: true,
+        creator: SAFE_USER_SELECT,
+        assignee: SAFE_USER_SELECT,
+      },
       order: { updatedAt: 'DESC' },
       take: 5,
     });

@@ -5,6 +5,7 @@ import { Project, ProjectStatus } from './project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryProjectDto } from './dto/query-project.dto';
+import { SAFE_USER_SELECT } from '../common/safe-user-select';
 
 @Injectable()
 export class ProjectsService {
@@ -30,6 +31,22 @@ export class ProjectsService {
     const qb = this.projectsRepository.createQueryBuilder('project')
       .leftJoinAndSelect('project.owner', 'owner')
       .leftJoinAndSelect('project.createdBy', 'createdBy')
+      .select([
+        'project.id',
+        'project.name',
+        'project.description',
+        'project.status',
+        'project.createdAt',
+        'project.updatedAt',
+        'owner.id',
+        'owner.name',
+        'owner.email',
+        'owner.role',
+        'createdBy.id',
+        'createdBy.name',
+        'createdBy.email',
+        'createdBy.role',
+      ])
       .orderBy('project.createdAt', 'DESC');
 
     if (status) {
@@ -46,7 +63,19 @@ export class ProjectsService {
   }
 
   async findOne(id: string): Promise<Project> {
-    const project = await this.projectsRepository.findOne({ where: { id } });
+    const project = await this.projectsRepository.findOne({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        owner: SAFE_USER_SELECT,
+        createdBy: SAFE_USER_SELECT,
+      },
+    });
     if (!project) throw new NotFoundException('Project not found');
     return project;
   }
