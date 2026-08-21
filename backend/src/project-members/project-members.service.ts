@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import { ProjectMember } from './project-member.entity';
 import { ProjectsService } from '../projects/projects.service';
 import { UsersService } from '../users/users.service';
+import { ActivityService } from '../activity/activity.service';
+import { ActivityAction } from '../activity/activity.entity';
 
 @Injectable()
 export class ProjectMembersService {
@@ -17,6 +19,7 @@ export class ProjectMembersService {
     private membersRepository: Repository<ProjectMember>,
     private projectsService: ProjectsService,
     private usersService: UsersService,
+    private activityService: ActivityService,
   ) {}
 
   async addMember(projectId: string, userId: string, requesterId: string): Promise<ProjectMember> {
@@ -29,10 +32,6 @@ export class ProjectMembersService {
     const user = await this.usersService.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
-    if (userId === project.owner.id) {
-      throw new ConflictException('Project owner is already a member');
-    }
-
     const existing = await this.membersRepository.findOne({
       where: { project: { id: projectId }, user: { id: userId } },
     });
@@ -43,25 +42,42 @@ export class ProjectMembersService {
       user: { id: userId } as any,
     });
 
-    return this.membersRepository.save(member);
+    const saved = await this.membersRepository.save(member);
+
+    await this.activityService.log(
+      ActivityAction.MEMBER_JOINED,
+      requesterId,
+      projectId,
+      { memberId: userId, memberName: user.name },
+    );
+
+    return saved;
   }
 
   async removeMember(projectId: string, userId: string, requesterId: string): Promise<void> {
     const project = await this.projectsService.findOne(projectId);
 
-    if (project.owner.id !== requesterId) {
-      throw new ForbiddenException('Only project owner can manage members');
-    }
-
     if (project.owner.id === userId) {
       throw new ForbiddenException('Project owner cannot be removed');
     }
 
+    if (project.owner.id !== requesterId) {
+      throw new ForbiddenException('Only project owner can manage members');
+    }
+
     const member = await this.membersRepository.findOne({
       where: { project: { id: projectId }, user: { id: userId } },
+      relations: { user: true },
     });
 
     if (!member) throw new NotFoundException('Member not found');
+
+    await this.activityService.log(
+      ActivityAction.MEMBER_REMOVED,
+      requesterId,
+      projectId,
+      { memberId: userId, memberName: member.user.name },
+    );
 
     await this.membersRepository.remove(member);
   }
@@ -69,11 +85,7 @@ export class ProjectMembersService {
   async getMembers(projectId: string): Promise<ProjectMember[]> {
     return this.membersRepository.find({
       where: { project: { id: projectId } },
-      select: {
-        id: true,
-        joinedAt: true,
-        user: { id: true, name: true, email: true, role: true },
-      },
+      relations: { user: true },
       order: { joinedAt: 'ASC' },
     });
   }

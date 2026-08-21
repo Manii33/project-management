@@ -67,3 +67,11 @@ export interface Comment {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Activity {
+  id: string;
+  action: string;
+  meta: Record<string, string>;
+  user: User;
+  createdAt: string;
+}
