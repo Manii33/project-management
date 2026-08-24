@@ -16,5 +16,6 @@ import { ActivityModule } from '../activity/activity.module';
   ],
   controllers: [ProjectMembersController],
   providers: [ProjectMembersService],
+   exports: [ProjectMembersService],
 })
 export class ProjectMembersModule {}

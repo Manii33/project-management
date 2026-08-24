@@ -5,11 +5,13 @@ import { Issue } from '../issues/issue.entity';
 import { CommentsService } from './comments.service';
 import { CommentsController } from './comments.controller';
 import { IssuesModule } from '../issues/issues.module';
+import { ActivityModule } from '../activity/activity.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Comment, Issue]),
     IssuesModule,
+    ActivityModule,
   ],
   controllers: [CommentsController],
   providers: [CommentsService],

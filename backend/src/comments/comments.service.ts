@@ -7,6 +7,8 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Issue } from '../issues/issue.entity';
 import { IssuesService } from '../issues/issues.service';
 import { SAFE_USER_SELECT } from '../common/safe-user-select';
+import { ActivityService } from '../activity/activity.service';
+import { ActivityAction } from '../activity/activity.entity';
 
 @Injectable()
 export class CommentsService {
@@ -16,6 +18,7 @@ export class CommentsService {
     @InjectRepository(Issue)
     private issuesRepository: Repository<Issue>,
     private issuesService: IssuesService,
+    private activityService: ActivityService,
   ) {}
 
   private async getIssueWithProject(issueId: string): Promise<Issue> {
@@ -49,6 +52,8 @@ export class CommentsService {
   async create(issueId: string, dto: CreateCommentDto, authorId: string): Promise<Comment> {
     await this.requireMember(issueId, authorId);
 
+    const issue = await this.getIssueWithProject(issueId);
+
     const comment = this.commentsRepository.create({
       content: dto.content,
       issue: { id: issueId } as any,
@@ -56,6 +61,13 @@ export class CommentsService {
     });
 
     const saved = await this.commentsRepository.save(comment);
+
+    await this.activityService.log(
+      ActivityAction.COMMENT_ADDED,
+      authorId,
+      issue.project.id,
+      { issueId, commentId: saved.id },
+    );
 
     return this.commentsRepository.findOne({
       where: { id: saved.id },
@@ -115,6 +127,13 @@ export class CommentsService {
     if (!isAdmin && comment.author.id !== userId) {
       throw new ForbiddenException('Only the comment author can delete it');
     }
+
+    await this.activityService.log(
+      ActivityAction.COMMENT_DELETED,
+      userId,
+      comment.issue.project.id,
+      { commentId, issueId },
+    );
 
     await this.commentsRepository.remove(comment);
   }

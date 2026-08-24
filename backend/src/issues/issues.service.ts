@@ -206,35 +206,66 @@ export class IssuesService {
   }
 
   async update(id: string, dto: UpdateIssueDto, userId: string): Promise<Issue> {
-    const issue = await this.findOne(id, userId);
+  const issue = await this.findOne(id, userId);
 
-    if (dto.assigneeId) {
-      const assigneeMember = await this.isMember(issue.project.id, dto.assigneeId);
-      if (!assigneeMember) throw new ForbiddenException('Assignee must be a project member');
-    }
-
-    Object.assign(issue, {
-      ...dto,
-      dueDate: dto.dueDate ? new Date(dto.dueDate) : issue.dueDate,
-      assignee: dto.assigneeId ? { id: dto.assigneeId } as any : issue.assignee,
-    });
-
-    return this.issuesRepository.save(issue);
+  if (dto.assigneeId) {
+    const assigneeMember = await this.isMember(issue.project.id, dto.assigneeId);
+    if (!assigneeMember) throw new ForbiddenException('Assignee must be a project member');
   }
 
-  async remove(id: string, userId: string): Promise<void> {
-    const issue = await this.findOne(id, userId);
-    if (issue.creator.id !== userId) {
-      throw new ForbiddenException('Only issue creator can delete it');
-    }
+  const oldStatus = issue.status;
 
-     await this.activityService.log(
-      ActivityAction.ISSUE_DELETED,
+  Object.assign(issue, {
+    ...dto,
+    dueDate: dto.dueDate ? new Date(dto.dueDate) : issue.dueDate,
+    assignee: dto.assigneeId ? { id: dto.assigneeId } as any : issue.assignee,
+  });
+
+  const saved = await this.issuesRepository.save(issue);
+
+  await this.activityService.log(
+    ActivityAction.ISSUE_UPDATED,
+    userId,
+    issue.project.id,
+    { issueTitle: issue.title, issueId: id },
+  );
+
+  if (dto.status && dto.status !== oldStatus) {
+    await this.activityService.log(
+      ActivityAction.ISSUE_STATUS_CHANGED,
       userId,
       issue.project.id,
-      { issueTitle: issue.title, issueId: id },
+      { issueTitle: issue.title, issueId: id, from: oldStatus, to: dto.status },
     );
-
-    await this.issuesRepository.remove(issue);
   }
+
+  if (dto.assigneeId) {
+    await this.activityService.log(
+      ActivityAction.ISSUE_ASSIGNED,
+      userId,
+      issue.project.id,
+      { issueTitle: issue.title, issueId: id, assigneeId: dto.assigneeId },
+    );
+  }
+
+  return saved;
+}
+
+
+async remove(id: string, userId: string): Promise<void> {
+  const issue = await this.findOne(id, userId);
+  if (issue.creator.id !== userId) {
+    throw new ForbiddenException('Only issue creator can delete it');
+  }
+
+  await this.issuesRepository.remove(issue);
+
+  // Log AFTER DB operation
+  await this.activityService.log(
+    ActivityAction.ISSUE_DELETED,
+    userId,
+    issue.project.id,
+    { issueTitle: issue.title, issueId: id },
+  );
+}
 }
