@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import { showErrorToast } from './toast';
 
 export interface ApiError {
   statusCode: number;
@@ -26,8 +27,22 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiError>) => {
-    const message = error.response?.data?.message || 'Something went wrong';
-    console.error('API Error:', message);
+    const status = error.response?.status;
+    const serverMessage = error.response?.data?.message;
+    const url = error.config?.url || '';
+    console.error('API Error:', serverMessage || 'Something went wrong');
+
+    // Auth pages apni inline errors dikhati hain — wahan toast noise nahi chahiye
+    if (!url.startsWith('/auth/') && status) {
+      let message = serverMessage || 'Something went wrong. Please try again.';
+      if (status === 401) {
+        message = 'Your session has expired. Please log in again.';
+      } else if (status === 403 && message === 'Forbidden resource') {
+        message = 'You do not have permission to perform this action (admin only).';
+      }
+      showErrorToast(message);
+    }
+
     return Promise.reject(error);
   }
 );

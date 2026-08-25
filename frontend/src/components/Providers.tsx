@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import ErrorBoundary from './ErrorBoundary';
+import Toaster from './ui/Toaster';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -28,6 +29,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <ErrorBoundary>
           {children}
         </ErrorBoundary>
+        <Toaster />
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
