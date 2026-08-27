@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/api';
+import api, { getErrorMessage } from '@/lib/api';
 import { Comment, UserRole } from '@/lib/types';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/lib/hooks/useRole';
@@ -26,7 +26,7 @@ export default function Comments({ issueId }: { issueId: string }) {
     queryClient.invalidateQueries({ queryKey: ['comments', issueId] });
   };
 
-  const { data: comments, isLoading, error } = useQuery({
+  const { data: comments, isLoading, error, refetch } = useQuery({
     queryKey: ['comments', issueId],
     queryFn: async () => {
       const res = await api.get<Comment[]>(`/issues/${issueId}/comments`);
@@ -41,7 +41,7 @@ export default function Comments({ issueId }: { issueId: string }) {
       setContent('');
       setFormError('');
     },
-    onError: () => setFormError('Failed to add comment'),
+    onError: (err) => setFormError(getErrorMessage(err)),
   });
 
   const updateMutation = useMutation({
@@ -52,7 +52,7 @@ export default function Comments({ issueId }: { issueId: string }) {
       setEditId(null);
       setEditContent('');
     },
-    onError: () => setFormError('Failed to update comment'),
+    onError: (err) => setFormError(getErrorMessage(err)),
   });
 
   const deleteMutation = useMutation({
@@ -101,7 +101,7 @@ export default function Comments({ issueId }: { issueId: string }) {
 
       {/* Loading / Error / Empty */}
       {isLoading && <LoadingSpinner size="sm" />}
-      {error && <ErrorMessage message="Failed to load comments" />}
+      {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
       {!isLoading && !error && comments?.length === 0 && (
         <p className="text-gray-400 text-sm text-center py-4">No comments yet</p>
       )}

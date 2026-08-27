@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import AppLayout from '@/components/layout/AppLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import api from '@/lib/api';
+import api, { getErrorMessage } from '@/lib/api';
 import { Issue, IssueStatus } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
@@ -52,7 +52,7 @@ export default function KanbanPage() {
     return fetched.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   };
 
-  const { data: issues, isLoading, error } = useQuery({
+  const { data: issues, isLoading, error, refetch } = useQuery({
     queryKey: ['issues-kanban', projectId],
     queryFn: fetchAllIssues,
   });
@@ -127,9 +127,21 @@ export default function KanbanPage() {
           </div>
 
           {isLoading && <LoadingSpinner />}
-          {error && <ErrorMessage message="Failed to load issues" />}
+          {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
 
-          {!isLoading && (
+          {!isLoading && !error && allIssues.length === 0 && (
+            <div className="bg-white border rounded-xl p-12 text-center">
+              <p className="text-gray-400 text-sm">No issues on this board yet</p>
+              <button
+                onClick={() => router.push(`/projects/${projectId}/issues`)}
+                className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              >
+                Create your first issue
+              </button>
+            </div>
+          )}
+
+          {!isLoading && !error && allIssues.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
               <div className="grid grid-cols-4 gap-4">
                 {COLUMNS.map((col) => (
