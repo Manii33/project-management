@@ -186,7 +186,7 @@ export default function ProjectsPage() {
 />
           </div>
 
-          <ActivityLog projectId={selectedProject.id} />
+          {isAdmin && <ActivityLog projectId={selectedProject.id} />}
         </AppLayout>
       </ProtectedRoute>
     );

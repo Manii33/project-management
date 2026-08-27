@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ActivityService } from './activity.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
-import { ProjectMembersService } from '../project-members/project-members.service';
+import { UserRole } from '../users/user.entity';
 import { ForbiddenException } from '@nestjs/common';
 
 @ApiTags('Activity')
@@ -11,10 +11,7 @@ import { ForbiddenException } from '@nestjs/common';
 @UseGuards(JwtAuthGuard)
 @Controller('projects/:projectId/activity')
 export class ActivityController {
-  constructor(
-    private activityService: ActivityService,
-    private projectMembersService: ProjectMembersService,
-  ) {}
+  constructor(private activityService: ActivityService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get project activity log' })
@@ -23,11 +20,8 @@ export class ActivityController {
     @Query('limit') limit: number,
     @Request() req: AuthenticatedRequest,
   ) {
-    const members = await this.projectMembersService.getMembers(projectId);
-    const isMember = members.some((m) => m.user.id === req.user.id);
-
-    if (!isMember) {
-      throw new ForbiddenException('Only project members can view activity');
+    if (req.user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only admins can view activity log');
     }
 
     return this.activityService.getProjectActivity(projectId, limit);
