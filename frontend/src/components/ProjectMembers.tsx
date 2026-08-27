@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/api';
+import api, { getErrorMessage } from '@/lib/api';
 import { ProjectMember, User } from '@/lib/types';
 import LoadingSpinner from './ui/LoadingSpinner';
 import ErrorMessage from './ui/ErrorMessage';
@@ -22,7 +22,7 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
 
   // Fetch members
-  const { data: members, isLoading, error } = useQuery({
+  const { data: members, isLoading, error, refetch } = useQuery({
     queryKey: ['members', projectId],
     queryFn: async () => {
       const res = await api.get<ProjectMember[]>(`/projects/${projectId}/members`);
@@ -31,7 +31,7 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
   });
 
   // Fetch all users (for adding) — directory is admin only
-  const { data: users } = useQuery({
+  const { data: users, error: usersError, refetch: refetchUsers } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const res = await api.get<User[]>('/users');
@@ -48,8 +48,8 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
       setUserId('');
       setAddError('');
     },
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-  setAddError(error.response?.data?.message || 'Failed to add member');
+    onError: (err) => {
+  setAddError(getErrorMessage(err));
 },
   });
 
@@ -81,11 +81,15 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
               className="flex-1 bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a user to add...</option>
-              {availableUsers?.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.name} ({u.email})
-                </option>
-              ))}
+              {usersError ? (
+                <option value="" disabled>Failed to load user directory</option>
+              ) : (
+                availableUsers?.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} ({u.email})
+                  </option>
+                ))
+              )}
             </select>
             <button
               onClick={() => {
@@ -98,6 +102,14 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
               Add
             </button>
           </div>
+          {usersError && (
+            <button
+              onClick={() => refetchUsers()}
+              className="text-xs text-blue-600 hover:text-blue-800 mt-1 underline"
+            >
+              Retry loading user directory
+            </button>
+          )}
           {addError && <p className="text-red-500 text-xs mt-1">{addError}</p>}
         </div>
       )}
@@ -110,9 +122,9 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
 
       {/* Members List */}
       {isLoading && <LoadingSpinner size="sm" />}
-      {error && <ErrorMessage message="Failed to load members" />}
+      {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
 
-      {members?.length === 0 && (
+      {!isLoading && !error && members?.length === 0 && (
         <p className="text-gray-400 text-sm text-center py-4">No members yet</p>
       )}
 

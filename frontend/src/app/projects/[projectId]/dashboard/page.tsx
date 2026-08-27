@@ -3,7 +3,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import AppLayout from '@/components/layout/AppLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import api from '@/lib/api';
+import api, { getErrorMessage } from '@/lib/api';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { Issue } from '@/lib/types';
@@ -41,7 +41,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const projectId = params.projectId as string;
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['dashboard', projectId],
     queryFn: async () => {
       const res = await api.get<DashboardStats>(`/projects/${projectId}/dashboard`);
@@ -65,7 +65,7 @@ export default function DashboardPage() {
           </div>
 
           {isLoading && <LoadingSpinner />}
-          {error && <ErrorMessage message="Failed to load dashboard" />}
+          {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
 
           {data && (
             <div className="space-y-6">
