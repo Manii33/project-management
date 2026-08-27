@@ -34,7 +34,8 @@ export default function LoginPage() {
   try {
     const res = await api.post<AuthResponse>('/auth/login', data);
     login(res.data.token, res.data.user);
-    router.push('/');
+    const redirect = new URLSearchParams(window.location.search).get('redirect');
+    router.push(redirect && redirect.startsWith('/') ? redirect : '/');
   } catch (error) {
     setError(getErrorMessage(error));
   } finally {

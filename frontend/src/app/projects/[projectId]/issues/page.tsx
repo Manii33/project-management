@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AppLayout from '@/components/layout/AppLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import api from '@/lib/api';
+import api, { getErrorMessage } from '@/lib/api';
 import { Issue, IssueStatus, IssuePriority, ProjectMember, PaginatedResponse } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
@@ -62,7 +62,7 @@ export default function IssuesPage() {
   const debouncedSearch = useDebounce(searchInput, 350);
 
   // Fetch issues
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['issues', projectId, filterStatus, filterPriority, filterAssignee, debouncedSearch, page],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -78,7 +78,7 @@ export default function IssuesPage() {
   });
 
   // Fetch members for assignee dropdown
-  const { data: members } = useQuery({
+  const { data: members, error: membersError } = useQuery({
     queryKey: ['members', projectId],
     queryFn: async () => {
       const res = await api.get<ProjectMember[]>(`/projects/${projectId}/members`);
@@ -245,7 +245,11 @@ export default function IssuesPage() {
             </select>
             <select value={filterAssignee} onChange={(e) => { setFilterAssignee(e.target.value); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">All Assignees</option>
-              {members?.map((m) => <option key={m.user.id} value={m.user.id}>{m.user.name}</option>)}
+              {membersError ? (
+                <option value="" disabled>Failed to load members</option>
+              ) : (
+                members?.map((m) => <option key={m.user.id} value={m.user.id}>{m.user.name}</option>)
+              )}
             </select>
             {(searchInput || filterStatus || filterPriority || filterAssignee) && (
               <button
@@ -316,7 +320,7 @@ export default function IssuesPage() {
 
           {/* Loading / Error / Empty */}
           {isLoading && <LoadingSpinner />}
-          {error && <ErrorMessage message="Failed to load issues" />}
+          {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
           {!isLoading && data?.data.length === 0 && (
             <div className="bg-white border rounded-xl p-12 text-center">
               <p className="text-gray-400 text-sm">No issues found</p>

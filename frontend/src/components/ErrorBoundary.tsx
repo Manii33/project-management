@@ -8,7 +8,6 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  error?: Error;
 }
 
 export default class ErrorBoundary extends Component<Props, State> {
@@ -18,7 +17,10 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    // Internal error ko browser console mein log karo (dev debugging ke liye),
+    // user ko kabhi raw details nahi dikhani chahiye
+    console.error('Unhandled render error:', error);
+    return { hasError: true };
   }
 
   render() {
@@ -28,7 +30,9 @@ export default class ErrorBoundary extends Component<Props, State> {
           <div className="bg-white border rounded-xl p-8 max-w-md text-center shadow-sm">
             <div className="text-4xl mb-4">⚠️</div>
             <h2 className="text-lg font-semibold text-gray-800 mb-2">Something went wrong</h2>
-            <p className="text-gray-500 text-sm mb-4">{this.state.error?.message}</p>
+            <p className="text-gray-500 text-sm mb-4">
+              An unexpected error occurred. Please try again.
+            </p>
             <button
               onClick={() => this.setState({ hasError: false })}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"

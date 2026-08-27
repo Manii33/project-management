@@ -1,11 +1,11 @@
-'use client';
+'use client';import ActivityLog from '@/components/ActivityLog';
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AppLayout from '@/components/layout/AppLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useRole } from '@/lib/hooks/useRole';
-import api from '@/lib/api';
+import api, { getErrorMessage } from '@/lib/api';
 import { Project, ProjectStatus, PaginatedResponse } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
@@ -44,7 +44,7 @@ export default function ProjectsPage() {
   const [page, setPage] = useState(1);
   const limit = 5;
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['projects', filterStatus, page],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -185,6 +185,8 @@ export default function ProjectsPage() {
   isOwner={user?.id === selectedProject.owner?.id}
 />
           </div>
+
+          <ActivityLog projectId={selectedProject.id} />
         </AppLayout>
       </ProtectedRoute>
     );
@@ -251,7 +253,7 @@ export default function ProjectsPage() {
 
           {/* Loading / Error / Empty */}
           {isLoading && <LoadingSpinner />}
-          {error && <ErrorMessage message="Failed to load projects" />}
+          {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
           {!isLoading && data?.data.length === 0 && (
             <div className="bg-white border rounded-xl p-12 text-center">
               <p className="text-gray-400 text-sm">No projects found</p>
