@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useRole } from '@/lib/hooks/useRole';
 
 const navItems = [
   { href: '/', label: '🏠 Dashboard' },
@@ -8,8 +9,13 @@ const navItems = [
   { href: '/issues', label: '🐛 Issues' },
 ];
 
+const adminItems = [{ href: '/admin/users', label: '⚙️ Admin Panel' }];
+
 export default function Sidebar() {
   const pathname = usePathname();
+  const { isAdmin } = useRole();
+
+  const items = isAdmin ? [...navItems, ...adminItems] : navItems;
 
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
@@ -20,7 +26,7 @@ export default function Sidebar() {
         <h1 className="text-xl font-bold">🚀 ProjectHub</h1>
       </div>
       <nav className="flex-1 p-4 space-y-1">
-        {navItems.map((item) => (
+        {items.map((item) => (
           <Link
             key={item.href}
             href={item.href}
