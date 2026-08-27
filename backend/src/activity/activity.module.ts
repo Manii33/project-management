@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Activity } from './activity.entity';
 import { ActivityService } from './activity.service';
@@ -8,7 +8,7 @@ import { ProjectMembersModule } from '../project-members/project-members.module'
 @Module({
   imports: [
     TypeOrmModule.forFeature([Activity]),
-    ProjectMembersModule,
+    forwardRef(() => ProjectMembersModule),
   ],
   controllers: [ActivityController],
   providers: [ActivityService],

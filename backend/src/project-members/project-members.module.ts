@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectMember } from './project-member.entity';
 import { ProjectMembersService } from './project-members.service';
@@ -12,7 +12,7 @@ import { ActivityModule } from '../activity/activity.module';
     TypeOrmModule.forFeature([ProjectMember]),
     ProjectsModule,
     UsersModule,
-    ActivityModule,
+    forwardRef(() => ActivityModule),
   ],
   controllers: [ProjectMembersController],
   providers: [ProjectMembersService],
