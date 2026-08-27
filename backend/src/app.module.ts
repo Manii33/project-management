@@ -10,6 +10,7 @@ import { IssuesModule } from './issues/issues.module';
 import { CommentsModule } from './comments/comments.module';
 import databaseConfig from './config/database.config';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ActivityModule } from './activity/activity.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     IssuesModule,
     CommentsModule,
     DashboardModule,
+    ActivityModule,
   ],
 })
 export class AppModule {}

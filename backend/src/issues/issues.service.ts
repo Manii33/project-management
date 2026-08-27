@@ -11,6 +11,8 @@ import { UpdateIssueDto } from './dto/update-issue.dto';
 import { QueryIssueDto } from './dto/query-issue.dto';
 import { ProjectMember } from '../project-members/project-member.entity';
 import { Project } from '../projects/project.entity';
+import { ActivityService } from '../activity/activity.service';
+import { ActivityAction } from '../activity/activity.entity';
 
 const ISSUE_WITH_PROJECT_SELECT = [
   'issue.id',
@@ -38,13 +40,14 @@ const ISSUE_WITH_PROJECT_SELECT = [
 @Injectable()
 export class IssuesService {
   constructor(
-    @InjectRepository(Issue)
-    private issuesRepository: Repository<Issue>,
-    @InjectRepository(ProjectMember)
-    private membersRepository: Repository<ProjectMember>,
-    @InjectRepository(Project)
-    private projectsRepository: Repository<Project>,
-  ) {}
+  @InjectRepository(Issue)
+  private issuesRepository: Repository<Issue>,
+  @InjectRepository(ProjectMember)
+  private membersRepository: Repository<ProjectMember>,
+  @InjectRepository(Project)
+  private projectsRepository: Repository<Project>,
+  private activityService: ActivityService,
+) {}
 
   async isMember(projectId: string, userId: string): Promise<boolean> {
     // Owner is always a member
@@ -185,27 +188,66 @@ export class IssuesService {
   }
 
   async update(id: string, dto: UpdateIssueDto, userId: string): Promise<Issue> {
-    const issue = await this.findOne(id, userId);
+  const issue = await this.findOne(id, userId);
 
-    if (dto.assigneeId) {
-      const assigneeMember = await this.isMember(issue.project.id, dto.assigneeId);
-      if (!assigneeMember) throw new ForbiddenException('Assignee must be a project member');
-    }
-
-    Object.assign(issue, {
-      ...dto,
-      dueDate: dto.dueDate ? new Date(dto.dueDate) : issue.dueDate,
-      assignee: dto.assigneeId ? { id: dto.assigneeId } as any : issue.assignee,
-    });
-
-    return this.issuesRepository.save(issue);
+  if (dto.assigneeId) {
+    const assigneeMember = await this.isMember(issue.project.id, dto.assigneeId);
+    if (!assigneeMember) throw new ForbiddenException('Assignee must be a project member');
   }
 
-  async remove(id: string, userId: string): Promise<void> {
-    const issue = await this.findOne(id, userId);
-    if (issue.creator.id !== userId) {
-      throw new ForbiddenException('Only issue creator can delete it');
-    }
-    await this.issuesRepository.remove(issue);
+  const oldStatus = issue.status;
+
+  Object.assign(issue, {
+    ...dto,
+    dueDate: dto.dueDate ? new Date(dto.dueDate) : issue.dueDate,
+    assignee: dto.assigneeId ? { id: dto.assigneeId } as any : issue.assignee,
+  });
+
+  const saved = await this.issuesRepository.save(issue);
+
+  await this.activityService.log(
+    ActivityAction.ISSUE_UPDATED,
+    userId,
+    issue.project.id,
+    { issueTitle: issue.title, issueId: id },
+  );
+
+  if (dto.status && dto.status !== oldStatus) {
+    await this.activityService.log(
+      ActivityAction.ISSUE_STATUS_CHANGED,
+      userId,
+      issue.project.id,
+      { issueTitle: issue.title, issueId: id, from: oldStatus, to: dto.status },
+    );
   }
+
+  if (dto.assigneeId) {
+    await this.activityService.log(
+      ActivityAction.ISSUE_ASSIGNED,
+      userId,
+      issue.project.id,
+      { issueTitle: issue.title, issueId: id, assigneeId: dto.assigneeId },
+    );
+  }
+
+  return saved;
+}
+
+
+async remove(id: string, userId: string): Promise<void> {
+  const issue = await this.findOne(id, userId);
+  if (issue.creator.id !== userId) {
+    throw new ForbiddenException('Only issue creator can delete it');
+  }
+
+  await this.issuesRepository.remove(issue);
+
+  // Log AFTER DB operation
+  await this.activityService.log(
+    ActivityAction.ISSUE_DELETED,
+    userId,
+    issue.project.id,
+    { issueTitle: issue.title, issueId: id },
+  );
+}
 }

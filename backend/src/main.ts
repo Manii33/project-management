@@ -12,12 +12,10 @@ async function bootstrap() {
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-
       const isAllowed =
         origin.includes('localhost') ||
         origin.endsWith('.vercel.app') ||
         (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL);
-
       if (isAllowed) {
         callback(null, true);
       } else {
