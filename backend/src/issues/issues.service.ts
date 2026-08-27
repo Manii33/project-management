@@ -49,7 +49,9 @@ export class IssuesService {
   private activityService: ActivityService,
 ) {}
 
-  async isMember(projectId: string, userId: string): Promise<boolean> {
+  async isMember(projectId: string, userId: string, isAdmin = false): Promise<boolean> {
+    // Admin ko sab projects/chizein access allowed
+    if (isAdmin) return true;
     // Owner is always a member
     const project = await this.projectsRepository.findOne({
       where: { id: projectId },
@@ -63,13 +65,13 @@ export class IssuesService {
     return !!member;
   }
 
-  async create(projectId: string, dto: CreateIssueDto, creatorId: string): Promise<Issue> {
-    const member = await this.isMember(projectId, creatorId);
+  async create(projectId: string, dto: CreateIssueDto, creatorId: string, isAdmin = false): Promise<Issue> {
+    const member = await this.isMember(projectId, creatorId, isAdmin);
     if (!member) throw new ForbiddenException('Only project members can create issues');
 
-    // Validate assignee is a member
+    // Validate assignee is a member (admin assignee check bhi bypass hota hai)
     if (dto.assigneeId) {
-      const assigneeMember = await this.isMember(projectId, dto.assigneeId);
+      const assigneeMember = await this.isMember(projectId, dto.assigneeId, isAdmin);
       if (!assigneeMember) throw new ForbiddenException('Assignee must be a project member');
     }
 
@@ -87,8 +89,8 @@ export class IssuesService {
     return this.issuesRepository.save(issue);
   }
 
-  async findAll(projectId: string, query: QueryIssueDto, userId: string) {
-    const member = await this.isMember(projectId, userId);
+  async findAll(projectId: string, query: QueryIssueDto, userId: string, isAdmin = false) {
+    const member = await this.isMember(projectId, userId, isAdmin);
     if (!member) throw new ForbiddenException('Only project members can view issues');
 
     const { status, priority, assigneeId, search, page = 1, limit = 10 } = query;
@@ -136,15 +138,18 @@ export class IssuesService {
     return { data, total, page, limit };
   }
 
-  async findAllGlobal(query: QueryIssueDto, userId: string) {
+  async findAllGlobal(query: QueryIssueDto, userId: string, isAdmin = false) {
     const { status, priority, assigneeId, search, page = 1, limit = 10 } = query;
 
-    const memberships = await this.membersRepository.find({
-      where: { user: { id: userId } },
-      relations: { project: true },
-    });
-    const projectIds = memberships.map((m) => m.project.id);
-    if (projectIds.length === 0) return { data: [], total: 0, page, limit };
+    let projectIds: string[] | null = null;
+    if (!isAdmin) {
+      const memberships = await this.membersRepository.find({
+        where: { user: { id: userId } },
+        relations: { project: true },
+      });
+      projectIds = memberships.map((m) => m.project.id);
+      if (projectIds.length === 0) return { data: [], total: 0, page, limit };
+    }
 
     const qb = this.issuesRepository
       .createQueryBuilder('issue')
@@ -152,8 +157,9 @@ export class IssuesService {
       .leftJoinAndSelect('issue.creator', 'creator')
       .leftJoinAndSelect('issue.assignee', 'assignee')
       .select(ISSUE_WITH_PROJECT_SELECT)
-      .where('issue.project IN (:...projectIds)', { projectIds })
       .orderBy('issue.createdAt', 'DESC');
+
+    if (!isAdmin) qb.where('issue.project IN (:...projectIds)', { projectIds });
 
     if (status) qb.andWhere('issue.status = :status', { status });
     if (priority) qb.andWhere('issue.priority = :priority', { priority });
@@ -170,7 +176,7 @@ export class IssuesService {
     return { data, total, page, limit };
   }
 
-  async findOne(id: string, userId: string): Promise<Issue> {
+  async findOne(id: string, userId: string, isAdmin = false): Promise<Issue> {
     const issue = await this.issuesRepository
       .createQueryBuilder('issue')
       .leftJoinAndSelect('issue.project', 'project')
@@ -181,17 +187,17 @@ export class IssuesService {
       .getOne();
     if (!issue) throw new NotFoundException('Issue not found');
 
-    const member = await this.isMember(issue.project.id, userId);
+    const member = await this.isMember(issue.project.id, userId, isAdmin);
     if (!member) throw new ForbiddenException('Only project members can view issues');
 
     return issue;
   }
 
-  async update(id: string, dto: UpdateIssueDto, userId: string): Promise<Issue> {
-  const issue = await this.findOne(id, userId);
+  async update(id: string, dto: UpdateIssueDto, userId: string, isAdmin = false): Promise<Issue> {
+  const issue = await this.findOne(id, userId, isAdmin);
 
   if (dto.assigneeId) {
-    const assigneeMember = await this.isMember(issue.project.id, dto.assigneeId);
+    const assigneeMember = await this.isMember(issue.project.id, dto.assigneeId, isAdmin);
     if (!assigneeMember) throw new ForbiddenException('Assignee must be a project member');
   }
 

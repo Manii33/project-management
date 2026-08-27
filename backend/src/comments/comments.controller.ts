@@ -32,7 +32,8 @@ export class CommentsController {
     @Body() dto: CreateCommentDto,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.commentsService.create(issueId, dto, req.user.id);
+    const isAdmin = req.user.role === UserRole.ADMIN;
+    return this.commentsService.create(issueId, dto, req.user.id, isAdmin);
   }
 
   @Get()
@@ -41,7 +42,8 @@ export class CommentsController {
     @Param('issueId', ParseUUIDPipe) issueId: string,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.commentsService.findAll(issueId, req.user.id);
+    const isAdmin = req.user.role === UserRole.ADMIN;
+    return this.commentsService.findAll(issueId, req.user.id, isAdmin);
   }
 
   @Put(':id')

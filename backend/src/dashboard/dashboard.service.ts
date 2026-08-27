@@ -13,8 +13,8 @@ export class DashboardService {
     private issuesService: IssuesService,
   ) {}
 
-  async getProjectStats(projectId: string, userId: string) {
-    if (!(await this.issuesService.isMember(projectId, userId))) {
+  async getProjectStats(projectId: string, userId: string, isAdmin = false) {
+    if (!(await this.issuesService.isMember(projectId, userId, isAdmin))) {
       throw new ForbiddenException('Only project members can view the dashboard');
     }
 

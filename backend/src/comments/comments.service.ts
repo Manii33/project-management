@@ -30,9 +30,9 @@ export class CommentsService {
     return issue;
   }
 
-  private async requireMember(issueId: string, userId: string): Promise<void> {
+  private async requireMember(issueId: string, userId: string, isAdmin = false): Promise<void> {
     const issue = await this.getIssueWithProject(issueId);
-    if (!(await this.issuesService.isMember(issue.project.id, userId))) {
+    if (!(await this.issuesService.isMember(issue.project.id, userId, isAdmin))) {
       throw new ForbiddenException('Only project members can interact with comments');
     }
   }
@@ -49,8 +49,8 @@ export class CommentsService {
     return comment;
   }
 
-  async create(issueId: string, dto: CreateCommentDto, authorId: string): Promise<Comment> {
-    await this.requireMember(issueId, authorId);
+  async create(issueId: string, dto: CreateCommentDto, authorId: string, isAdmin = false): Promise<Comment> {
+    await this.requireMember(issueId, authorId, isAdmin);
 
     const issue = await this.getIssueWithProject(issueId);
 
@@ -81,8 +81,8 @@ export class CommentsService {
     });
   }
 
-  async findAll(issueId: string, userId: string) {
-    await this.requireMember(issueId, userId);
+  async findAll(issueId: string, userId: string, isAdmin = false) {
+    await this.requireMember(issueId, userId, isAdmin);
 
     return this.commentsRepository.find({
       where: { issue: { id: issueId } },
@@ -99,7 +99,7 @@ export class CommentsService {
 
   async update(issueId: string, commentId: string, dto: UpdateCommentDto, userId: string, isAdmin: boolean) {
     const comment = await this.findComment(issueId, commentId);
-    await this.requireMember(comment.issue.id, userId);
+    await this.requireMember(comment.issue.id, userId, isAdmin);
 
     if (!isAdmin && comment.author.id !== userId) {
       throw new ForbiddenException('Only the comment author can edit it');
@@ -122,7 +122,7 @@ export class CommentsService {
 
   async remove(issueId: string, commentId: string, userId: string, isAdmin: boolean): Promise<void> {
     const comment = await this.findComment(issueId, commentId);
-    await this.requireMember(comment.issue.id, userId);
+    await this.requireMember(comment.issue.id, userId, isAdmin);
 
     if (!isAdmin && comment.author.id !== userId) {
       throw new ForbiddenException('Only the comment author can delete it');

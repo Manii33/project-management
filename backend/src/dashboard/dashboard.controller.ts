@@ -2,6 +2,7 @@ import { Controller, Get, Param, UseGuards, ParseUUIDPipe, Request } from '@nest
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { DashboardService } from './dashboard.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UserRole } from '../users/user.entity';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 
 @ApiTags('Dashboard')
@@ -17,6 +18,7 @@ export class DashboardController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.dashboardService.getProjectStats(projectId, req.user.id);
+    const isAdmin = req.user.role === UserRole.ADMIN;
+    return this.dashboardService.getProjectStats(projectId, req.user.id, isAdmin);
   }
 }

@@ -17,6 +17,7 @@ import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateIssueDto } from './dto/update-issue.dto';
 import { QueryIssueDto } from './dto/query-issue.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UserRole } from '../users/user.entity';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 
 @ApiTags('Issues')
@@ -33,7 +34,8 @@ export class IssuesController {
     @Body() dto: CreateIssueDto,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.issuesService.create(projectId, dto, req.user.id);
+    const isAdmin = req.user.role === UserRole.ADMIN;
+    return this.issuesService.create(projectId, dto, req.user.id, isAdmin);
   }
 
   @Get()
@@ -43,7 +45,8 @@ export class IssuesController {
     @Query() query: QueryIssueDto,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.issuesService.findAll(projectId, query, req.user.id);
+    const isAdmin = req.user.role === UserRole.ADMIN;
+    return this.issuesService.findAll(projectId, query, req.user.id, isAdmin);
   }
 
   @Get(':id')
@@ -52,7 +55,8 @@ export class IssuesController {
     @Param('id', ParseUUIDPipe) id: string,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.issuesService.findOne(id, req.user.id);
+    const isAdmin = req.user.role === UserRole.ADMIN;
+    return this.issuesService.findOne(id, req.user.id, isAdmin);
   }
 
   @Put(':id')
@@ -62,7 +66,8 @@ export class IssuesController {
     @Body() dto: UpdateIssueDto,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.issuesService.update(id, dto, req.user.id);
+    const isAdmin = req.user.role === UserRole.ADMIN;
+    return this.issuesService.update(id, dto, req.user.id, isAdmin);
   }
 
   @Delete(':id')
