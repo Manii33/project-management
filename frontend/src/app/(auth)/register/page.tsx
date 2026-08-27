@@ -33,7 +33,7 @@ export default function RegisterPage() {
   setLoading(true);
   setError('');
   try {
-    const res = await api.post<AuthResponse>('/auth/login', data);
+    const res = await api.post<AuthResponse>('/auth/register', data);
     login(res.data.token, res.data.user);
     router.push('/');
   } catch (error) {
