@@ -1,10 +1,12 @@
 import { NestFactory } from '@nestjs/core';
+import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './filters/http-exception.filter';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalFilters(new GlobalExceptionFilter());
@@ -49,8 +51,8 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port);
 
-  console.log(`✅ Backend: http://localhost:${port}`);
-  console.log(`📄 Swagger: http://localhost:${port}/api/docs`);
-  console.log(`❤️  Health:  http://localhost:${port}/api/health`);
+  logger.log(`Backend running on http://localhost:${port}`);
+  logger.log(`Swagger docs on http://localhost:${port}/api/docs`);
+  logger.log(`Health check on http://localhost:${port}/api/health`);
 }
 void bootstrap();
