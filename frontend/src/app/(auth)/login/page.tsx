@@ -29,19 +29,23 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginForm) => {
-  setLoading(true);
-  setError('');
-  try {
-    const res = await api.post<AuthResponse>('/auth/login', data);
-    login(res.data.token, res.data.user);
-    const redirect = new URLSearchParams(window.location.search).get('redirect');
-    router.push(redirect && redirect.startsWith('/') ? redirect : '/');
-  } catch (error) {
-    setError(getErrorMessage(error));
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    setError('');
+    try {
+      const res = await api.post<AuthResponse>('/auth/login', data);
+      login(res.data.token, res.data.user);
+      const rawRedirect = new URLSearchParams(window.location.search).get('redirect');
+      const redirect =
+        rawRedirect && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
+          ? rawRedirect
+          : '/';
+      router.push(redirect);
+    } catch (error) {
+      setError(getErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">

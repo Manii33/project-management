@@ -12,25 +12,9 @@ import ConfirmModal from '@/components/ui/ConfirmModal';
 import Comments from '@/components/Comments';
 import { useAuth } from '@/context/AuthContext';
 import { useDebounce } from '@/lib/hooks/useDebounce';
+import { STATUS_COLORS, PRIORITY_COLORS, STATUSES, PRIORITIES } from '@/lib/constants';
 
 const inputClass = 'w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400';
-
-const STATUS_COLORS: Record<IssueStatus, string> = {
-  TODO: 'bg-gray-100 text-gray-600',
-  IN_PROGRESS: 'bg-blue-100 text-blue-700',
-  IN_REVIEW: 'bg-yellow-100 text-yellow-700',
-  DONE: 'bg-green-100 text-green-700',
-};
-
-const PRIORITY_COLORS: Record<IssuePriority, string> = {
-  LOW: 'bg-gray-100 text-gray-500',
-  MEDIUM: 'bg-blue-100 text-blue-600',
-  HIGH: 'bg-orange-100 text-orange-600',
-  URGENT: 'bg-red-100 text-red-600',
-};
-
-const STATUSES: IssueStatus[] = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'];
-const PRIORITIES: IssuePriority[] = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 
 export default function IssuesPage() {
   const params = useParams();
