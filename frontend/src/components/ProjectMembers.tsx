@@ -68,8 +68,8 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
   );
 
   return (
-    <div className="bg-white border rounded-xl p-6 shadow-sm mt-4">
-      <h2 className="font-semibold text-gray-700 mb-4">Project Members</h2>
+    <div className="bg-white border rounded-xl p-6 shadow-sm mt-4 dark:bg-slate-900 dark:border-slate-700">
+      <h2 className="font-semibold text-gray-700 dark:text-slate-100 mb-4">Project Members</h2>
 
       {/* Add Member — Owner Only */}
       {isOwner && isAdmin && (
@@ -78,7 +78,7 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
             <select
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              className="flex-1 bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 bg-white text-gray-900 dark:bg-slate-800 dark:text-slate-100 border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a user to add...</option>
               {usersError ? (
@@ -115,7 +115,7 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
       )}
 
       {isOwner && !isAdmin && (
-        <p className="text-xs text-gray-400 mb-5">
+        <p className="text-xs text-gray-400 dark:text-slate-500 mb-5">
           Only admins can browse the user directory to add members.
         </p>
       )}
@@ -125,26 +125,26 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
       {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
 
       {!isLoading && !error && members?.length === 0 && (
-        <p className="text-gray-400 text-sm text-center py-4">No members yet</p>
+        <p className="text-gray-400 dark:text-slate-500 text-sm text-center py-4">No members yet</p>
       )}
 
       <div className="space-y-2">
         {members?.map((member) => (
           <div
             key={member.id}
-            className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
+            className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0 dark:border-slate-800"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
                 {member.user.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-800">{member.user.name}</p>
-                <p className="text-xs text-gray-400">{member.user.email}</p>
+                <p className="text-sm font-medium text-gray-800 dark:text-slate-100">{member.user.name}</p>
+                <p className="text-xs text-gray-400 dark:text-slate-500">{member.user.email}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 dark:text-slate-500">
                 {new Date(member.joinedAt).toLocaleDateString()}
               </span>
               {isOwner && member.user.id !== ownerId && (

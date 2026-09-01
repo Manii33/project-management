@@ -12,17 +12,17 @@ import { useRole } from '@/lib/hooks/useRole';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 
 const STATUS_COLORS: Record<IssueStatus, string> = {
-  TODO: 'bg-gray-100 text-gray-600',
-  IN_PROGRESS: 'bg-blue-100 text-blue-700',
-  IN_REVIEW: 'bg-yellow-100 text-yellow-700',
-  DONE: 'bg-green-100 text-green-700',
+  TODO: 'bg-gray-100 text-gray-600 dark:bg-gray-500/15 dark:text-gray-300',
+  IN_PROGRESS: 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300',
+  IN_REVIEW: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-300',
+  DONE: 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300',
 };
 
 const PRIORITY_COLORS: Record<IssuePriority, string> = {
-  LOW: 'bg-gray-100 text-gray-500',
-  MEDIUM: 'bg-blue-100 text-blue-600',
-  HIGH: 'bg-orange-100 text-orange-600',
-  URGENT: 'bg-red-100 text-red-600',
+  LOW: 'bg-gray-100 text-gray-500 dark:bg-gray-500/15 dark:text-gray-300',
+  MEDIUM: 'bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300',
+  HIGH: 'bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-300',
+  URGENT: 'bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-300',
 };
 
 const PRIORITY_DOTS: Record<IssuePriority, string> = {
@@ -36,7 +36,7 @@ const STATUSES: IssueStatus[] = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'];
 const PRIORITIES: IssuePriority[] = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 
 const selectClass =
-  'bg-white text-gray-700 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition-shadow';
+  'bg-white text-gray-700 dark:bg-slate-800 dark:text-slate-200 border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition-shadow';
 
 export default function AllIssuesPage() {
   const router = useRouter();
@@ -89,14 +89,14 @@ export default function AllIssuesPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">All Issues</h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">All Issues</h1>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
                 {data && <span>{data.total} issue{data.total !== 1 ? 's' : ''} across your projects</span>}
               </p>
             </div>
             {!isLoading && data && data.total > 0 && (
               <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+                <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-500/15 dark:text-gray-300 text-xs font-medium">
                   Page {page} of {totalPages || 1}
                 </span>
               </div>
@@ -105,11 +105,11 @@ export default function AllIssuesPage() {
 
           {/* Search */}
           <div className="relative mb-4">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500">🔍</span>
             <input
               value={searchInput}
               onChange={(e) => { setSearchInput(e.target.value); setPage(1); }}
-              className="w-full bg-white text-gray-900 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 shadow-sm transition-shadow placeholder-gray-400"
+              className="w-full bg-white text-gray-900 dark:bg-slate-800 dark:text-slate-100 border border-gray-300 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 shadow-sm transition-shadow placeholder-gray-400 dark:placeholder-slate-500"
               placeholder="Search by title, description, or assignee..."
             />
           </div>
@@ -137,7 +137,7 @@ export default function AllIssuesPage() {
                   setFilterAssignee('');
                   setPage(1);
                 }}
-                className="px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors font-medium"
+                className="px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 dark:text-red-400 dark:border-red-500/30 dark:hover:bg-red-500/10 transition-colors font-medium"
               >
                 ✕ Reset Filters
               </button>
@@ -148,10 +148,10 @@ export default function AllIssuesPage() {
           {isLoading && <LoadingSpinner />}
           {error && <ErrorMessage message="Failed to load issues" />}
           {!isLoading && !error && data?.data.length === 0 && (
-            <div className="bg-white border rounded-2xl p-16 text-center shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border rounded-2xl p-16 text-center shadow-sm">
               <div className="text-4xl mb-3">🗂️</div>
-              <p className="text-gray-500 font-medium">{hasActiveFilters ? 'No issues match your filters' : 'No issues yet'}</p>
-              <p className="text-gray-400 text-sm mt-1">
+              <p className="text-gray-500 dark:text-slate-300 font-medium">{hasActiveFilters ? 'No issues match your filters' : 'No issues yet'}</p>
+              <p className="text-gray-400 dark:text-slate-500 text-sm mt-1">
                 {hasActiveFilters ? 'Try adjusting your search or filters.' : 'Issues you can access will appear here.'}
               </p>
             </div>
@@ -166,13 +166,13 @@ export default function AllIssuesPage() {
                 <div
                   key={issue.id}
                   onClick={() => router.push(`/projects/${issue.project.id}/issues`)}
-                  className="group bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-lg hover:border-blue-200 transition-all cursor-pointer"
+                  className="group bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 hover:shadow-lg hover:border-blue-200 transition-all cursor-pointer"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       {/* Top row: project + badges */}
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 text-xs font-semibold">
+                        <span className="px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 dark:bg-gray-500/15 dark:text-gray-300 text-xs font-semibold">
                           {issue.project?.name}
                         </span>
                         <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[issue.status]}`}>
@@ -184,29 +184,29 @@ export default function AllIssuesPage() {
                       </div>
 
                       {/* Title */}
-                      <h3 className="font-semibold text-gray-900 mt-2 group-hover:text-blue-700 transition-colors">
+                      <h3 className="font-semibold text-gray-900 dark:text-slate-100 mt-2 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                         {issue.title}
                       </h3>
 
                       {/* Description */}
                       {issue.description && (
-                        <p className="text-gray-500 text-sm mt-1 line-clamp-1">{issue.description}</p>
+                        <p className="text-gray-500 dark:text-slate-400 text-sm mt-1 line-clamp-1">{issue.description}</p>
                       )}
 
                       {/* Footer meta */}
-                      <div className="flex items-center gap-5 mt-3 text-xs text-gray-500 flex-wrap">
+                      <div className="flex items-center gap-5 mt-3 text-xs text-gray-500 dark:text-slate-400 flex-wrap">
                         {issue.assignee ? (
                           <span className="flex items-center gap-1.5">
-                            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-[10px]">
+                            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 flex items-center justify-center font-bold text-[10px]">
                               {issue.assignee.name.charAt(0).toUpperCase()}
                             </span>
                             {issue.assignee.name}
                           </span>
                         ) : (
-                          <span className="text-gray-400">Unassigned</span>
+                          <span className="text-gray-400 dark:text-slate-500">Unassigned</span>
                         )}
                         {issue.dueDate && (
-                          <span className={`flex items-center gap-1 ${overdue && !done ? 'text-red-600 font-medium' : ''}`}>
+                          <span className={`flex items-center gap-1 ${overdue && !done ? 'text-red-600 dark:text-red-400 font-medium' : ''}`}>
                             {overdue && !done ? '⚠️' : '📅'}
                             Due {new Date(issue.dueDate).toLocaleDateString()}
                             {overdue && !done && ' · Overdue'}
@@ -219,7 +219,7 @@ export default function AllIssuesPage() {
                     {/* Right: priority dot + arrow */}
                     <div className="flex flex-col items-end gap-3 flex-shrink-0">
                       <span className={`w-2.5 h-2.5 rounded-full ${PRIORITY_DOTS[issue.priority]}`} />
-                      <span className="text-gray-300 group-hover:text-blue-500 text-lg transition-colors">→</span>
+                      <span className="text-gray-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 text-lg transition-colors">→</span>
                     </div>
                   </div>
                 </div>
@@ -229,23 +229,23 @@ export default function AllIssuesPage() {
 
           {/* Pagination */}
           {data && data.total > limit && (
-            <div className="flex items-center justify-between mt-8 pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-500">
+            <div className="flex items-center justify-between mt-8 pt-4 border-t border-gray-200 dark:border-slate-800">
+              <p className="text-sm text-gray-500 dark:text-slate-400">
                 Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, data.total)} of {data.total}
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-slate-200 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   ← Previous
                 </button>
-                <span className="px-3 py-2 text-sm text-gray-600 font-medium">{page} / {totalPages}</span>
+                <span className="px-3 py-2 text-sm text-gray-600 dark:text-slate-300 font-medium">{page} / {totalPages}</span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-slate-200 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Next →
                 </button>

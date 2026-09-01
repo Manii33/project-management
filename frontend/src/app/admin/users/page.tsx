@@ -54,24 +54,24 @@ export default function AdminUsersPage() {
         <div className="max-w-4xl">
           <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 Admin Panel
               </h1>
 
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
                 Manage user roles across the system
               </p>
             </div>
 
             {!isLoading && users && (
               <div className="flex gap-3">
-                <span className="px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-100 text-purple-700 text-xs font-medium flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-lg bg-purple-50 dark:bg-purple-500/10 border border-purple-100 dark:border-purple-500/30 text-purple-700 dark:text-purple-300 text-xs font-medium flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
                   {users?.filter((u) => u.role === UserRole.ADMIN).length || 0}{' '}
                   Admin(s)
                 </span>
 
-                <span className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/30 text-blue-700 dark:text-blue-300 text-xs font-medium flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                   {users?.length || 0} Total Users
                 </span>
@@ -84,9 +84,9 @@ export default function AdminUsersPage() {
           {error && <ErrorMessage message="Failed to load users" />}
 
           {!isLoading && users && (
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
               <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 text-gray-500 uppercase text-xs border-b border-gray-200">
+                <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 uppercase text-xs border-b border-gray-200 dark:border-slate-700">
                   <tr>
                     <th className="px-4 py-3.5 font-semibold tracking-wide">User</th>
                     <th className="px-4 py-3.5 font-semibold tracking-wide">Email</th>
@@ -107,14 +107,14 @@ export default function AdminUsersPage() {
                     return (
                       <tr
                         key={u.id}
-                        className="border-t border-gray-100 hover:bg-blue-50/50 transition-colors"
+                        className="border-t border-gray-100 dark:border-slate-800 hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-colors"
                       >
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-3">
-                            <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 ${u.role === UserRole.ADMIN ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                            <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 ${u.role === UserRole.ADMIN ? 'bg-purple-100 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300'}`}>
                               {u.name.charAt(0).toUpperCase()}
                             </span>
-                            <span className="font-medium text-gray-800">
+                            <span className="font-medium text-gray-800 dark:text-slate-100">
                               {u.name}
 
                               {isSelf && (
@@ -126,11 +126,11 @@ export default function AdminUsersPage() {
                           </div>
                         </td>
 
-                        <td className="px-4 py-3.5 text-gray-500">
+                        <td className="px-4 py-3.5 text-gray-500 dark:text-slate-400">
                           {u.email}
                         </td>
 
-                        <td className="px-4 py-3.5 text-gray-400 text-xs">
+                        <td className="px-4 py-3.5 text-gray-400 dark:text-slate-500 text-xs">
                           {u.createdAt
                             ? new Date(u.createdAt).toLocaleDateString()
                             : '—'}
@@ -154,7 +154,7 @@ export default function AdminUsersPage() {
                                 ? 'At least one admin is required'
                                 : undefined
                             }
-                            className={`rounded-lg px-2.5 py-1.5 border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 ${u.role === UserRole.ADMIN ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
+                            className={`rounded-lg px-2.5 py-1.5 border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 ${u.role === UserRole.ADMIN ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/30' : 'bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-slate-200 border-gray-200 dark:border-slate-700'}`}
                           >
                             <option value={UserRole.MEMBER}>
                               Member
@@ -172,7 +172,7 @@ export default function AdminUsersPage() {
               </table>
 
               {actionError && (
-                <div className="px-4 py-3 bg-red-50 border-t border-red-100 text-red-600 text-sm">
+                <div className="px-4 py-3 bg-red-50 dark:bg-red-500/10 border-t border-red-100 dark:border-red-500/30 text-red-600 dark:text-red-400 text-sm">
                   {actionError}
                 </div>
               )}
@@ -180,14 +180,14 @@ export default function AdminUsersPage() {
           )}
 
           {!isLoading && !error && users?.length === 0 && (
-            <div className="bg-white border border-gray-200 rounded-2xl p-16 text-center shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-16 text-center shadow-sm">
               <p className="text-4xl mb-3">👥</p>
-              <p className="text-gray-500 font-medium">No users found</p>
+              <p className="text-gray-500 dark:text-slate-300 font-medium">No users found</p>
             </div>
           )}
 
-          <p className="text-xs text-gray-400 mt-3 flex items-center gap-1.5">
-            <span className="w-1 h-1 rounded-full bg-gray-300 inline-block" />
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-3 flex items-center gap-1.5">
+            <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-slate-500 inline-block" />
             Note: Role changes take effect for that user after they log in again.
           </p>
         </div>

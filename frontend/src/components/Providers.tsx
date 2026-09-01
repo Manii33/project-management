@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import ErrorBoundary from './ErrorBoundary';
 import Toaster from './ui/Toaster';
 
@@ -25,13 +26,15 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
-        <Toaster />
-      </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ThemeProvider>
+        <AuthProvider>
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
+          <Toaster />
+        </AuthProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
