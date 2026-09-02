@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ExportProvider } from '@/lib/export-context';
+import { DateRangeProvider } from '@/lib/date-range-context';
 import ErrorBoundary from './ErrorBoundary';
 import Toaster from './ui/Toaster';
 
@@ -29,10 +30,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <ExportProvider>
-            <ErrorBoundary>{children}</ErrorBoundary>
-            <Toaster />
-          </ExportProvider>
+          <DateRangeProvider>
+            <ExportProvider>
+              <ErrorBoundary>{children}</ErrorBoundary>
+              <Toaster />
+            </ExportProvider>
+          </DateRangeProvider>
         </AuthProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </ThemeProvider>

@@ -6,7 +6,8 @@ import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useExportData } from '@/lib/export-context';
-import { formatDateRange } from '@/lib/date';
+import { useDateRange, DATE_RANGE_LABELS } from '@/lib/date-range-context';
+import { rangeStartDate } from '@/lib/date';
 import { Issue, Project, PaginatedResponse, UserRole } from '@/lib/types';
 
 const METRIC_META: Record<string, { tint: string; bar: string; gradient: string; iconBg: string; iconColor: string; sub: string }> = {
@@ -300,6 +301,7 @@ export default function HomePage() {
   const [tab, setTab] = useState(0);
   const { user } = useAuth();
   const { setData } = useExportData();
+  const { range } = useDateRange();
 
   const { data: issuesData } = useQuery({
     queryKey: ['overview', 'issues'],
@@ -320,19 +322,29 @@ export default function HomePage() {
   const issues = useMemo(() => issuesData?.data ?? [], [issuesData]);
   const projects = useMemo(() => projectsData?.data ?? [], [projectsData]);
 
-  const open = issues.filter((i) => i.status === 'TODO').length;
-  const inProgress = issues.filter((i) => i.status === 'IN_PROGRESS').length;
-  const inReview = issues.filter((i) => i.status === 'IN_REVIEW').length;
-  const critical = issues.filter((i) => i.priority === 'URGENT' && i.status !== 'DONE').length;
+  const filteredIssues = useMemo(() => {
+    const start = rangeStartDate(range);
+    if (!start) return issues;
+    const s = start.getTime();
+    return issues.filter((i) => {
+      const t = new Date(i.createdAt).getTime();
+      return t >= s;
+    });
+  }, [issues, range]);
+
+  const open = filteredIssues.filter((i) => i.status === 'TODO').length;
+  const inProgress = filteredIssues.filter((i) => i.status === 'IN_PROGRESS').length;
+  const inReview = filteredIssues.filter((i) => i.status === 'IN_REVIEW').length;
+  const critical = filteredIssues.filter((i) => i.priority === 'URGENT' && i.status !== 'DONE').length;
 
   const metricCards = useMemo(
     () => [
-      { label: 'Open Issues', value: open, pct: issues.length > 0 ? Math.round((open / issues.length) * 100) : 0 },
-      { label: 'In Progress', value: inProgress, pct: issues.length > 0 ? Math.round((inProgress / issues.length) * 100) : 0 },
-      { label: 'In Review', value: inReview, pct: issues.length > 0 ? Math.round((inReview / issues.length) * 100) : 0 },
-      { label: 'Critical', value: critical, pct: issues.length > 0 ? Math.round((critical / issues.length) * 100) : 0 },
+      { label: 'Open Issues', value: open, pct: filteredIssues.length > 0 ? Math.round((open / filteredIssues.length) * 100) : 0 },
+      { label: 'In Progress', value: inProgress, pct: filteredIssues.length > 0 ? Math.round((inProgress / filteredIssues.length) * 100) : 0 },
+      { label: 'In Review', value: inReview, pct: filteredIssues.length > 0 ? Math.round((inReview / filteredIssues.length) * 100) : 0 },
+      { label: 'Critical', value: critical, pct: filteredIssues.length > 0 ? Math.round((critical / filteredIssues.length) * 100) : 0 },
     ],
-    [issues, open, inProgress, inReview, critical]
+    [filteredIssues, open, inProgress, inReview, critical]
   );
 
   const activeTab = TABS[tab];
@@ -342,7 +354,7 @@ export default function HomePage() {
     if (!user) return;
 
     const memberMap = new Map<string, { name: string; role: string; done: number; assigned: number; inProgress: number }>();
-    issues.forEach((i) => {
+    filteredIssues.forEach((i) => {
       const actor = i.assignee ?? i.creator;
       if (!actor) return;
       const cur = memberMap.get(actor.id) ?? { name: actor.name, role: actor.role, done: 0, assigned: 0, inProgress: 0 };
@@ -353,7 +365,7 @@ export default function HomePage() {
     });
 
     const projectRows = projects.map((p) => {
-      const pIssues = issues.filter((x) => x.project.id === p.id);
+      const pIssues = filteredIssues.filter((x) => x.project.id === p.id);
       const done = pIssues.filter((x) => x.status === 'DONE').length;
       const total = pIssues.length;
       const openCount = pIssues.filter((x) => x.status !== 'DONE').length;
@@ -367,7 +379,7 @@ export default function HomePage() {
     }).sort((a, b) => a.openIssues - b.openIssues || b.totalIssues - a.totalIssues);
 
     setData({
-      dateRange: formatDateRange(),
+      dateRange: DATE_RANGE_LABELS[range],
       generatedAt: new Date().toLocaleString(),
       generatedBy: user.name,
       activeTab,
@@ -384,7 +396,7 @@ export default function HomePage() {
           completionPct: m.assigned > 0 ? Math.round((m.done / m.assigned) * 100) : 0,
         })),
     });
-  }, [issues, projects, user, activeTab, metricCards, setData]);
+  }, [filteredIssues, projects, user, activeTab, metricCards, range, setData]);
 
   return (
     <ProtectedRoute>
@@ -457,7 +469,7 @@ export default function HomePage() {
               </h2>
               <p className="text-sm text-slate-400 dark:text-zinc-500 mt-0.5">{activeContent.sub}</p>
             </div>
-            {activeContent.render(issues)}
+            {activeContent.render(filteredIssues)}
           </div>
         </div>
       </AppLayout>
