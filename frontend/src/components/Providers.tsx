@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { ExportProvider } from '@/lib/export-context';
 import ErrorBoundary from './ErrorBoundary';
 import Toaster from './ui/Toaster';
 
@@ -28,10 +29,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <ErrorBoundary>
-            {children}
-          </ErrorBoundary>
-          <Toaster />
+          <ExportProvider>
+            <ErrorBoundary>{children}</ErrorBoundary>
+            <Toaster />
+          </ExportProvider>
         </AuthProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </ThemeProvider>
