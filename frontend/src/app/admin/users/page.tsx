@@ -52,26 +52,26 @@ export default function AdminUsersPage() {
     <ProtectedRoute>
       <AppLayout>
         <div className="max-w-4xl">
-          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                Admin Panel
+              <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-zinc-50">
+                Team
               </h1>
 
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1.5">
                 Manage user roles across the system
               </p>
             </div>
 
             {!isLoading && users && (
-              <div className="flex gap-3">
-                <span className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium flex items-center gap-1.5">
+              <div className="flex gap-2.5">
+                <span className="px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                   {users?.filter((u) => u.role === UserRole.ADMIN).length || 0}{' '}
                   Admin(s)
                 </span>
 
-                <span className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-medium flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                   {users?.length || 0} Total Users
                 </span>
@@ -84,14 +84,14 @@ export default function AdminUsersPage() {
           {error && <ErrorMessage message="Failed to load users" />}
 
           {!isLoading && users && (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden">
               <table className="w-full text-sm text-left">
-                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase text-xs border-b border-slate-200 dark:border-slate-700">
+                <thead className="bg-slate-50 dark:bg-zinc-800/50 text-slate-400 dark:text-zinc-500 uppercase text-xs border-b border-slate-200/80 dark:border-zinc-800">
                   <tr>
-                    <th className="px-4 py-3.5 font-semibold tracking-wide">User</th>
-                    <th className="px-4 py-3.5 font-semibold tracking-wide">Email</th>
-                    <th className="px-4 py-3.5 font-semibold tracking-wide">Joined</th>
-                    <th className="px-4 py-3.5 font-semibold tracking-wide text-right">Role</th>
+                    <th className="px-6 py-3 font-semibold tracking-wide">User</th>
+                    <th className="px-6 py-3 font-semibold tracking-wide">Email</th>
+                    <th className="px-6 py-3 font-semibold tracking-wide">Joined</th>
+                    <th className="px-6 py-3 font-semibold tracking-wide text-right">Role</th>
                   </tr>
                 </thead>
 
@@ -107,14 +107,14 @@ export default function AdminUsersPage() {
                     return (
                       <tr
                         key={u.id}
-                        className="border-t border-slate-100 dark:border-slate-800 hover:bg-indigo-50/50 dark:hover:bg-slate-800 transition-colors"
+                        className="border-t border-slate-100 dark:border-zinc-800 hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors"
                       >
-                        <td className="px-4 py-3.5">
+                        <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 ${u.role === UserRole.ADMIN ? 'bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300' : 'bg-slate-100 dark:bg-slate-700/40 text-slate-600 dark:text-slate-200'}`}>
+                            <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 ${u.role === UserRole.ADMIN ? 'bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300' : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-200'}`}>
                               {u.name.charAt(0).toUpperCase()}
                             </span>
-                            <span className="font-medium text-slate-800 dark:text-slate-100">
+                            <span className="font-medium text-slate-800 dark:text-zinc-100">
                               {u.name}
 
                               {isSelf && (
@@ -126,17 +126,17 @@ export default function AdminUsersPage() {
                           </div>
                         </td>
 
-                        <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400">
+                        <td className="px-6 py-4 text-slate-500 dark:text-zinc-400">
                           {u.email}
                         </td>
 
-                        <td className="px-4 py-3.5 text-slate-400 dark:text-slate-500 text-xs">
+                        <td className="px-6 py-4 text-slate-400 dark:text-zinc-500 text-xs">
                           {u.createdAt
                             ? new Date(u.createdAt).toLocaleDateString()
                             : '—'}
                         </td>
 
-                        <td className="px-4 py-3.5 text-right">
+                        <td className="px-6 py-4 text-right">
                           <select
                             value={u.role}
                             onChange={(e) =>
@@ -154,7 +154,7 @@ export default function AdminUsersPage() {
                                 ? 'At least one admin is required'
                                 : undefined
                             }
-                            className={`rounded-lg px-2.5 py-1.5 border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60 ${u.role === UserRole.ADMIN ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/30' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}`}
+                            className={`rounded-lg px-2.5 py-1.5 border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60 ${u.role === UserRole.ADMIN ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/30' : 'bg-slate-50 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 border-slate-200 dark:border-zinc-700'}`}
                           >
                             <option value={UserRole.MEMBER}>
                               Member
@@ -180,14 +180,14 @@ export default function AdminUsersPage() {
           )}
 
           {!isLoading && !error && users?.length === 0 && (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-16 text-center shadow-sm">
+            <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-2xl p-16 text-center shadow-sm">
               <p className="text-4xl mb-3 text-slate-300">👥</p>
-              <p className="text-slate-500 dark:text-slate-300 font-medium">No users found</p>
+              <p className="text-slate-500 dark:text-zinc-300 font-medium">No users found</p>
             </div>
           )}
 
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-3 flex items-center gap-1.5">
-            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-500 inline-block" />
+          <p className="text-xs text-slate-400 dark:text-zinc-500 mt-3 flex items-center gap-1.5">
+            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-zinc-500 inline-block" />
             Note: Role changes take effect for that user after they log in again.
           </p>
         </div>
