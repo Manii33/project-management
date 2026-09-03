@@ -11,17 +11,17 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 
 const COLUMNS: { id: IssueStatus; label: string; color: string; headerColor: string }[] = [
-  { id: 'TODO', label: 'To Do', color: 'bg-gray-50', headerColor: 'bg-gray-100' },
-  { id: 'IN_PROGRESS', label: 'In Progress', color: 'bg-blue-50', headerColor: 'bg-blue-100' },
-  { id: 'IN_REVIEW', label: 'In Review', color: 'bg-yellow-50', headerColor: 'bg-yellow-100' },
-  { id: 'DONE', label: 'Done', color: 'bg-green-50', headerColor: 'bg-green-100' },
+  { id: 'TODO', label: 'To Do', color: 'bg-gray-50 dark:bg-slate-800/40', headerColor: 'bg-gray-100 dark:bg-slate-800' },
+  { id: 'IN_PROGRESS', label: 'In Progress', color: 'bg-blue-50 dark:bg-blue-500/10', headerColor: 'bg-blue-100 dark:bg-blue-500/20' },
+  { id: 'IN_REVIEW', label: 'In Review', color: 'bg-yellow-50 dark:bg-yellow-500/10', headerColor: 'bg-yellow-100 dark:bg-yellow-500/20' },
+  { id: 'DONE', label: 'Done', color: 'bg-green-50 dark:bg-green-500/10', headerColor: 'bg-green-100 dark:bg-green-500/20' },
 ];
 
 const PRIORITY_COLORS: Record<string, string> = {
-  LOW: 'bg-gray-100 text-gray-500',
-  MEDIUM: 'bg-blue-100 text-blue-600',
-  HIGH: 'bg-orange-100 text-orange-600',
-  URGENT: 'bg-red-100 text-red-600',
+  LOW: 'bg-gray-100 text-gray-500 dark:bg-gray-500/15 dark:text-gray-300',
+  MEDIUM: 'bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300',
+  HIGH: 'bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-300',
+  URGENT: 'bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-300',
 };
 
 const PAGE_SIZE = 20;
@@ -113,14 +113,14 @@ export default function KanbanPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.back()}
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="text-sm text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300"
               >
                 ←
               </button>
-              <h1 className="text-2xl font-bold text-gray-800">Kanban Board</h1>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">Kanban Board</h1>
             </div>
             {dragError && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm">
+              <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-lg text-sm">
                 {dragError}
               </div>
             )}
@@ -130,8 +130,8 @@ export default function KanbanPage() {
           {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
 
           {!isLoading && !error && allIssues.length === 0 && (
-            <div className="bg-white border rounded-xl p-12 text-center">
-              <p className="text-gray-400 text-sm">No issues on this board yet</p>
+            <div className="bg-white dark:bg-slate-900 border rounded-xl p-12 text-center">
+              <p className="text-gray-400 dark:text-slate-500 text-sm">No issues on this board yet</p>
               <button
                 onClick={() => router.push(`/projects/${projectId}/issues`)}
                 className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -146,10 +146,10 @@ export default function KanbanPage() {
               <div className="grid grid-cols-4 gap-4">
                 {COLUMNS.map((col) => (
                   <div key={col.id} className="flex flex-col min-h-96">
-                    <div className={`rounded-t-xl px-4 py-3 ${col.headerColor} border border-b-0 border-gray-200`}>
+                    <div className={`rounded-t-xl px-4 py-3 ${col.headerColor} border border-b-0 border-gray-200 dark:border-slate-700`}>
                       <div className="flex items-center justify-between">
-                        <h2 className="font-semibold text-gray-700 text-sm">{col.label}</h2>
-                        <span className="bg-white text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200">
+                        <h2 className="font-semibold text-gray-700 dark:text-slate-100 text-sm">{col.label}</h2>
+                        <span className="bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200 dark:border-slate-700">
                           {issuesByStatus[col.id].length}
                         </span>
                       </div>
@@ -160,10 +160,10 @@ export default function KanbanPage() {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className={`flex-1 p-2 border border-gray-200 rounded-b-xl transition-colors ${
+                          className={`flex-1 p-2 border border-gray-200 dark:border-slate-700 rounded-b-xl transition-colors ${
                             snapshot.isDraggingOver
                               ? `${col.color} border-blue-300`
-                              : 'bg-gray-50'
+                              : 'bg-gray-50 dark:bg-slate-800/50'
                           }`}
                         >
                           {issuesByStatus[col.id].map((issue, index) => (
@@ -177,13 +177,13 @@ export default function KanbanPage() {
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
-                                  className={`bg-white border border-gray-200 rounded-lg p-3 mb-2 cursor-grab active:cursor-grabbing transition-all ${
+                                  className={`bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg p-3 mb-2 cursor-grab active:cursor-grabbing transition-all ${
                                     snapshot.isDragging
                                       ? 'shadow-lg rotate-1 border-blue-300'
                                       : 'shadow-sm hover:shadow-md'
                                   }`}
                                 >
-                                  <p className="text-sm font-medium text-gray-800 mb-2">
+                                  <p className="text-sm font-medium text-gray-800 dark:text-slate-100 mb-2">
                                     {issue.title}
                                   </p>
                                   <div className="flex items-center justify-between">
@@ -197,7 +197,7 @@ export default function KanbanPage() {
                                     )}
                                   </div>
                                   {issue.dueDate && (
-                                    <p className="text-xs text-gray-400 mt-2">
+                                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">
                                       📅 {new Date(issue.dueDate).toLocaleDateString()}
                                     </p>
                                   )}
@@ -208,7 +208,7 @@ export default function KanbanPage() {
                           {provided.placeholder}
 
                           {issuesByStatus[col.id].length === 0 && !snapshot.isDraggingOver && (
-                            <div className="text-center py-8 text-gray-300 text-xs">
+                            <div className="text-center py-8 text-gray-300 dark:text-slate-600 text-xs">
                               Drop here
                             </div>
                           )}

@@ -53,25 +53,25 @@ export default function ActivityLog({ projectId }: Props) {
   if (isLoading) return <LoadingSpinner size="sm" />;
 
   return (
-    <div className="bg-white border rounded-xl p-6 shadow-sm mt-4">
-      <h2 className="font-semibold text-gray-700 mb-4">Recent Activity</h2>
+    <div className="bg-white border rounded-xl p-6 shadow-sm mt-4 dark:bg-slate-900 dark:border-slate-700">
+      <h2 className="font-semibold text-gray-700 dark:text-slate-100 mb-4">Recent Activity</h2>
 
       {activities?.length === 0 && (
-        <p className="text-gray-400 text-sm text-center py-4">No activity yet</p>
+        <p className="text-gray-400 dark:text-slate-500 text-sm text-center py-4">No activity yet</p>
       )}
 
       <div className="space-y-3">
         {activities?.map((activity) => (
-          <div key={activity.id} className="flex items-start gap-3 py-2 border-b border-gray-100 last:border-0">
+          <div key={activity.id} className="flex items-start gap-3 py-2 border-b border-gray-100 last:border-0 dark:border-slate-800">
             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               {activity.user?.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-700">
-                <span className="font-medium">{activity.user?.name}</span>{' '}
+              <p className="text-sm text-gray-700 dark:text-slate-200">
+                <span className="font-medium dark:text-slate-100">{activity.user?.name}</span>{' '}
                 {getActivityMessage(activity)}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
                 {new Date(activity.createdAt).toLocaleString()}
               </p>
             </div>

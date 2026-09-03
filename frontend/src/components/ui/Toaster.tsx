@@ -34,15 +34,15 @@ export default function Toaster() {
           key={toast.id}
           className={`flex items-start gap-3 rounded-lg border px-4 py-3 shadow-lg ${
             toast.type === 'error'
-              ? 'border-red-200 bg-red-50 text-red-700'
-              : 'border-green-200 bg-green-50 text-green-700'
+              ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400'
+              : 'border-green-200 bg-green-50 text-green-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400'
           }`}
         >
           <span className="text-base leading-none mt-0.5">{toast.type === 'error' ? '⛔' : '✅'}</span>
           <p className="flex-1 text-sm font-medium">{toast.message}</p>
           <button
             onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
-            className={`text-sm leading-none hover:opacity-70 ${toast.type === 'error' ? 'text-red-500' : 'text-green-600'}`}
+            className={`text-sm leading-none hover:opacity-70 ${toast.type === 'error' ? 'text-red-500 dark:text-red-400' : 'text-green-600 dark:text-emerald-400'}`}
             aria-label="Dismiss"
           >
             ✕
