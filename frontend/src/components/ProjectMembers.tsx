@@ -68,17 +68,17 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
   );
 
   return (
-    <div className="bg-white border rounded-xl p-6 shadow-sm mt-4">
+    <div className="bg-white border rounded-xl p-4 sm:p-6 shadow-sm mt-4">
       <h2 className="font-semibold text-gray-700 mb-4">Project Members</h2>
 
       {/* Add Member — Owner Only */}
       {isOwner && isAdmin && (
         <div className="mb-5">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <select
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              className="flex-1 bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0"
             >
               <option value="">Select a user to add...</option>
               {usersError ? (
@@ -97,7 +97,7 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
                 addMutation.mutate(userId);
               }}
               disabled={!userId || addMutation.isPending}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="bg-blue-600 text-white px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors min-h-[44px] sm:min-h-0 w-full sm:w-auto"
             >
               Add
             </button>
@@ -132,25 +132,25 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
         {members?.map((member) => (
           <div
             key={member.id}
-            className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-2 border-b border-gray-100 last:border-0 gap-2"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0">
                 {member.user.name.charAt(0).toUpperCase()}
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-800">{member.user.name}</p>
-                <p className="text-xs text-gray-400">{member.user.email}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-800 truncate">{member.user.name}</p>
+                <p className="text-xs text-gray-400 truncate">{member.user.email}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:ml-4 shrink-0">
               <span className="text-xs text-gray-400">
                 {new Date(member.joinedAt).toLocaleDateString()}
               </span>
               {isOwner && member.user.id !== ownerId && (
                 <button
                   onClick={() => setConfirmRemove(member.user.id)}
-                  className="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded border border-red-200 hover:bg-red-50"
+                  className="text-xs text-red-500 hover:text-red-700 px-2 py-2 sm:py-1 rounded border border-red-200 hover:bg-red-50 min-h-[40px] sm:min-h-0"
                 >
                   Remove
                 </button>

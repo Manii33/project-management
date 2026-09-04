@@ -1,4 +1,4 @@
-import { IsOptional, IsEnum, IsInt, Min } from 'class-validator';
+import { IsOptional, IsEnum, IsInt, Min, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ProjectStatus } from '../project.entity';
@@ -8,6 +8,11 @@ export class QueryProjectDto {
   @IsEnum(ProjectStatus)
   @IsOptional()
   status?: ProjectStatus;
+
+  @ApiProperty({ required: false, description: 'Cursor for keyset pagination (overrides page)' })
+  @IsString()
+  @IsOptional()
+  cursor?: string;
 
   @ApiProperty({ default: 1, required: false })
   @IsInt()

@@ -6,6 +6,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryProjectDto } from './dto/query-project.dto';
 import { SAFE_USER_SELECT } from '../common/safe-user-select';
+import { encodeCursor, decodeCursor } from '../common/cursor.util';
 
 @Injectable()
 export class ProjectsService {
@@ -25,10 +26,58 @@ export class ProjectsService {
     return this.projectsRepository.save(project);
   }
 
-  async findAll(query: QueryProjectDto): Promise<{ data: Project[]; total: number; page: number; limit: number }> {
-    const { status, page = 1, limit = 10 } = query;
+  async findAll(query: QueryProjectDto) {
+    const { status, page = 1, limit = 10, cursor } = query;
 
-    const qb = this.projectsRepository.createQueryBuilder('project')
+    // Cursor path — keyset pagination
+    if (cursor) {
+      const c = decodeCursor(cursor);
+      const take = limit + 1;
+
+      let qb = this.projectsRepository
+        .createQueryBuilder('project')
+        .leftJoinAndSelect('project.owner', 'owner')
+        .leftJoinAndSelect('project.createdBy', 'createdBy')
+        .select([
+          'project.id',
+          'project.name',
+          'project.description',
+          'project.status',
+          'project.createdAt',
+          'project.updatedAt',
+          'owner.id',
+          'owner.name',
+          'owner.email',
+          'owner.role',
+          'createdBy.id',
+          'createdBy.name',
+          'createdBy.email',
+          'createdBy.role',
+        ])
+        .orderBy('project.createdAt', 'DESC')
+        .addOrderBy('project.id', 'DESC')
+        .andWhere(
+          '(project.createdAt < :cursorTs OR (project.createdAt = :cursorTs AND project.id < :cursorId))',
+          { cursorTs: c.ts, cursorId: c.id },
+        )
+        .take(take);
+
+      if (status) {
+        qb = qb.andWhere('project.status = :status', { status });
+      }
+
+      const data = await qb.getMany();
+      const hasNextPage = data.length > limit;
+      const items = hasNextPage ? data.slice(0, limit) : data;
+      const last = items[items.length - 1];
+      const nextCursor = hasNextPage ? encodeCursor(last.createdAt as unknown as string, last.id) : null;
+
+      return { data: items, nextCursor, hasNextPage };
+    }
+
+    // Offset path — legacy, used when no cursor is sent
+    const qb = this.projectsRepository
+      .createQueryBuilder('project')
       .leftJoinAndSelect('project.owner', 'owner')
       .leftJoinAndSelect('project.createdBy', 'createdBy')
       .select([
@@ -47,19 +96,19 @@ export class ProjectsService {
         'createdBy.email',
         'createdBy.role',
       ])
-      .orderBy('project.createdAt', 'DESC');
+      .orderBy('project.createdAt', 'DESC')
+      .addOrderBy('project.id', 'DESC');
 
     if (status) {
       qb.andWhere('project.status = :status', { status });
     }
 
-    const total = await qb.getCount();
     const data = await qb
       .skip((page - 1) * limit)
       .take(limit)
       .getMany();
 
-    return { data, total, page, limit };
+    return { data, total: data.length, page, limit };
   }
 
   async findOne(id: string): Promise<Project> {

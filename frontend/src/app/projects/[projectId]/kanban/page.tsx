@@ -109,18 +109,18 @@ export default function KanbanPage() {
     <ProtectedRoute>
       <AppLayout>
         <div>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.back()}
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="text-sm text-gray-500 hover:text-gray-700 p-2 -ml-1"
               >
                 ←
               </button>
-              <h1 className="text-2xl font-bold text-gray-800">Kanban Board</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Kanban Board</h1>
             </div>
             {dragError && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 sm:py-2 rounded-lg text-sm break-words">
                 {dragError}
               </div>
             )}
@@ -130,11 +130,11 @@ export default function KanbanPage() {
           {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
 
           {!isLoading && !error && allIssues.length === 0 && (
-            <div className="bg-white border rounded-xl p-12 text-center">
+            <div className="bg-white border rounded-xl p-6 sm:p-12 text-center">
               <p className="text-gray-400 text-sm">No issues on this board yet</p>
               <button
                 onClick={() => router.push(`/projects/${projectId}/issues`)}
-                className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="mt-3 px-4 py-2.5 sm:py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors min-h-[44px] sm:min-h-0"
               >
                 Create your first issue
               </button>
@@ -143,9 +143,10 @@ export default function KanbanPage() {
 
           {!isLoading && !error && allIssues.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
-              <div className="grid grid-cols-4 gap-4">
-                {COLUMNS.map((col) => (
-                  <div key={col.id} className="flex flex-col min-h-96">
+              <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 min-w-0 lg:min-w-0">
+                  {COLUMNS.map((col) => (
+                  <div key={col.id} className="flex flex-col min-h-[300px] lg:min-h-96">
                     <div className={`rounded-t-xl px-4 py-3 ${col.headerColor} border border-b-0 border-gray-200`}>
                       <div className="flex items-center justify-between">
                         <h2 className="font-semibold text-gray-700 text-sm">{col.label}</h2>
@@ -183,7 +184,7 @@ export default function KanbanPage() {
                                       : 'shadow-sm hover:shadow-md'
                                   }`}
                                 >
-                                  <p className="text-sm font-medium text-gray-800 mb-2">
+                                  <p className="text-sm font-medium text-gray-800 mb-2 break-words">
                                     {issue.title}
                                   </p>
                                   <div className="flex items-center justify-between">
@@ -217,6 +218,7 @@ export default function KanbanPage() {
                     </Droppable>
                   </div>
                 ))}
+                </div>
               </div>
             </DragDropContext>
           )}
