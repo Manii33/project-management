@@ -13,6 +13,7 @@ import { ProjectMember } from '../project-members/project-member.entity';
 import { Project } from '../projects/project.entity';
 import { ActivityService } from '../activity/activity.service';
 import { ActivityAction } from '../activity/activity.entity';
+import { encodeCursor, decodeCursor } from '../common/cursor.util';
 
 const ISSUE_WITH_PROJECT_SELECT = [
   'issue.id',
@@ -93,45 +94,67 @@ export class IssuesService {
     const member = await this.isMember(projectId, userId, isAdmin);
     if (!member) throw new ForbiddenException('Only project members can view issues');
 
-    const { status, priority, assigneeId, search, page = 1, limit = 10 } = query;
+    const { status, priority, assigneeId, search, page = 1, limit = 10, cursor } = query;
 
-    const qb = this.issuesRepository
-  .createQueryBuilder('issue')
-  .leftJoinAndSelect('issue.creator', 'creator')
-  .leftJoinAndSelect('issue.assignee', 'assignee')
-  .select([
-    'issue.id',
-    'issue.title',
-    'issue.order',
-    'issue.description',
-    'issue.status',
-    'issue.priority',
-    'issue.dueDate',
-    'issue.createdAt',
-    'issue.updatedAt',
-    'creator.id',
-    'creator.name',
-    'creator.email',
-    'creator.role',
-    'assignee.id',
-    'assignee.name',
-    'assignee.email',
-    'assignee.role',
-  ])
-  .where('issue.project = :projectId', { projectId })
-  .orderBy('issue.order', 'ASC')
-  .addOrderBy('issue.createdAt', 'DESC');
+    const buildQb = () => {
+      const qb = this.issuesRepository
+        .createQueryBuilder('issue')
+        .leftJoinAndSelect('issue.creator', 'creator')
+        .leftJoinAndSelect('issue.assignee', 'assignee')
+        .select([
+          'issue.id',
+          'issue.title',
+          'issue.order',
+          'issue.description',
+          'issue.status',
+          'issue.priority',
+          'issue.dueDate',
+          'issue.createdAt',
+          'issue.updatedAt',
+          'creator.id',
+          'creator.name',
+          'creator.email',
+          'creator.role',
+          'assignee.id',
+          'assignee.name',
+          'assignee.email',
+          'assignee.role',
+        ])
+        .where('issue.project = :projectId', { projectId })
+        .orderBy('issue.createdAt', 'DESC')
+        .addOrderBy('issue.id', 'DESC');
 
-    if (status) qb.andWhere('issue.status = :status', { status });
-    if (priority) qb.andWhere('issue.priority = :priority', { priority });
-    if (assigneeId) qb.andWhere('assignee.id = :assigneeId', { assigneeId });
-    if (search) {
-      qb.andWhere(
-        '(LOWER(issue.title) LIKE LOWER(:search) OR LOWER(issue.description) LIKE LOWER(:search) OR LOWER(assignee.name) LIKE LOWER(:search))',
-        { search: `%${search}%` },
-      );
+      if (status) qb.andWhere('issue.status = :status', { status });
+      if (priority) qb.andWhere('issue.priority = :priority', { priority });
+      if (assigneeId) qb.andWhere('assignee.id = :assigneeId', { assigneeId });
+      if (search) {
+        qb.andWhere(
+          '(LOWER(issue.title) LIKE LOWER(:search) OR LOWER(issue.description) LIKE LOWER(:search) OR LOWER(assignee.name) LIKE LOWER(:search))',
+          { search: `%${search}%` },
+        );
+      }
+      return qb;
+    };
+
+    // Cursor path
+    if (cursor) {
+      const c = decodeCursor(cursor);
+      const qb = buildQb().andWhere(
+        '(issue.createdAt < :cursorTs OR (issue.createdAt = :cursorTs AND issue.id < :cursorId))',
+        { cursorTs: c.ts, cursorId: c.id },
+      ).take(limit + 1);
+
+      const data = await qb.getMany();
+      const hasNextPage = data.length > limit;
+      const items = hasNextPage ? data.slice(0, limit) : data;
+      const last = items[items.length - 1];
+      const nextCursor = hasNextPage ? encodeCursor(last.createdAt as unknown as string, last.id) : null;
+
+      return { data: items, nextCursor, hasNextPage };
     }
 
+    // Offset path — legacy
+    const qb = buildQb();
     const total = await qb.getCount();
     const data = await qb.skip((page - 1) * limit).take(limit).getMany();
 
@@ -139,7 +162,7 @@ export class IssuesService {
   }
 
   async findAllGlobal(query: QueryIssueDto, userId: string, isAdmin = false) {
-    const { status, priority, assigneeId, search, page = 1, limit = 10 } = query;
+    const { status, priority, assigneeId, search, page = 1, limit = 10, cursor } = query;
 
     let projectIds: string[] | null = null;
     if (!isAdmin) {
@@ -148,29 +171,52 @@ export class IssuesService {
         relations: { project: true },
       });
       projectIds = memberships.map((m) => m.project.id);
-      if (projectIds.length === 0) return { data: [], total: 0, page, limit };
+      if (projectIds.length === 0) return { data: [], nextCursor: null, hasNextPage: false };
     }
 
-    const qb = this.issuesRepository
-      .createQueryBuilder('issue')
-      .leftJoinAndSelect('issue.project', 'project')
-      .leftJoinAndSelect('issue.creator', 'creator')
-      .leftJoinAndSelect('issue.assignee', 'assignee')
-      .select(ISSUE_WITH_PROJECT_SELECT)
-      .orderBy('issue.createdAt', 'DESC');
+    const buildQb = () => {
+      const qb = this.issuesRepository
+        .createQueryBuilder('issue')
+        .leftJoinAndSelect('issue.project', 'project')
+        .leftJoinAndSelect('issue.creator', 'creator')
+        .leftJoinAndSelect('issue.assignee', 'assignee')
+        .select(ISSUE_WITH_PROJECT_SELECT)
+        .orderBy('issue.createdAt', 'DESC')
+        .addOrderBy('issue.id', 'DESC');
 
-    if (!isAdmin) qb.where('issue.project IN (:...projectIds)', { projectIds });
+      if (!isAdmin) qb.where('issue.project IN (:...projectIds)', { projectIds });
 
-    if (status) qb.andWhere('issue.status = :status', { status });
-    if (priority) qb.andWhere('issue.priority = :priority', { priority });
-    if (assigneeId) qb.andWhere('assignee.id = :assigneeId', { assigneeId });
-    if (search) {
-      qb.andWhere(
-        '(LOWER(issue.title) LIKE LOWER(:search) OR LOWER(issue.description) LIKE LOWER(:search) OR LOWER(assignee.name) LIKE LOWER(:search))',
-        { search: `%${search}%` },
-      );
+      if (status) qb.andWhere('issue.status = :status', { status });
+      if (priority) qb.andWhere('issue.priority = :priority', { priority });
+      if (assigneeId) qb.andWhere('assignee.id = :assigneeId', { assigneeId });
+      if (search) {
+        qb.andWhere(
+          '(LOWER(issue.title) LIKE LOWER(:search) OR LOWER(issue.description) LIKE LOWER(:search) OR LOWER(assignee.name) LIKE LOWER(:search))',
+          { search: `%${search}%` },
+        );
+      }
+      return qb;
+    };
+
+    // Cursor path
+    if (cursor) {
+      const c = decodeCursor(cursor);
+      const qb = buildQb().andWhere(
+        '(issue.createdAt < :cursorTs OR (issue.createdAt = :cursorTs AND issue.id < :cursorId))',
+        { cursorTs: c.ts, cursorId: c.id },
+      ).take(limit + 1);
+
+      const data = await qb.getMany();
+      const hasNextPage = data.length > limit;
+      const items = hasNextPage ? data.slice(0, limit) : data;
+      const last = items[items.length - 1];
+      const nextCursor = hasNextPage ? encodeCursor(last.createdAt as unknown as string, last.id) : null;
+
+      return { data: items, nextCursor, hasNextPage };
     }
 
+    // Offset path — legacy
+    const qb = buildQb();
     const [data, total] = await qb.skip((page - 1) * limit).take(limit).getManyAndCount();
 
     return { data, total, page, limit };

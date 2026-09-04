@@ -55,9 +55,11 @@ export interface Issue {
 
 export interface PaginatedResponse<T> {
   data: T[];
-  total: number;
-  page: number;
-  limit: number;
+  total?: number;
+  page?: number;
+  limit?: number;
+  nextCursor: string | null;
+  hasNextPage: boolean;
 }
 
 export interface Comment {

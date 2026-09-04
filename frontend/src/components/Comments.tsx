@@ -93,7 +93,7 @@ export default function Comments({ issueId }: { issueId: string }) {
         <button
           onClick={handleAdd}
           disabled={!content.trim() || createMutation.isPending}
-          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+          className="mt-2 bg-blue-600 text-white px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 min-h-[44px] sm:min-h-0"
         >
           {createMutation.isPending ? 'Posting...' : 'Post Comment'}
         </button>
@@ -125,16 +125,16 @@ export default function Comments({ issueId }: { issueId: string }) {
                   </span>
                 </div>
                 {canModerate(c.author?.id) && (
-                  <div className="flex gap-2 shrink-0">
+                  <div className="flex gap-1 shrink-0">
                     <button
                       onClick={() => { setEditId(c.id); setEditContent(c.content); }}
-                      className="text-xs text-blue-600 hover:text-blue-800"
+                      className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1.5 rounded min-h-[44px] sm:min-h-0 flex items-center"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => setConfirmDelete(c.id)}
-                      className="text-xs text-red-500 hover:text-red-700"
+                      className="text-xs text-red-500 hover:text-red-700 px-2 py-1.5 rounded min-h-[44px] sm:min-h-0 flex items-center"
                     >
                       Delete
                     </button>
@@ -150,17 +150,17 @@ export default function Comments({ issueId }: { issueId: string }) {
                     className={inputClass}
                     rows={2}
                   />
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex flex-col sm:flex-row gap-2 mt-2">
                     <button
                       onClick={() => handleUpdate(c.id)}
                       disabled={!editContent.trim() || updateMutation.isPending}
-                      className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                      className="bg-blue-600 text-white px-3 py-2.5 sm:py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 min-h-[44px] sm:min-h-0"
                     >
                       Save
                     </button>
                     <button
                       onClick={() => { setEditId(null); setEditContent(''); }}
-                      className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200"
+                      className="bg-gray-100 text-gray-700 px-3 py-2.5 sm:py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200 min-h-[44px] sm:min-h-0"
                     >
                       Cancel
                     </button>

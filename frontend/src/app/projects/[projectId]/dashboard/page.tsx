@@ -57,11 +57,11 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => router.back()}
-              className="text-sm text-gray-500 hover:text-gray-700"
+              className="text-sm text-gray-500 hover:text-gray-700 p-2 -ml-1"
             >
               ←
             </button>
-            <h1 className="text-2xl font-bold text-gray-800">Project Dashboard</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Project Dashboard</h1>
           </div>
 
           {isLoading && <LoadingSpinner />}
@@ -71,7 +71,7 @@ export default function DashboardPage() {
             <div className="space-y-6">
 
               {/* Stats Cards */}
-              <div className="grid grid-cols-3 gap-4 md:grid-cols-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-6">
                 <StatCard label="Total" value={data.total} color="bg-gray-50 border-gray-200" />
                 <StatCard label="Todo" value={data.todo} color="bg-gray-50 border-gray-200" />
                 <StatCard label="In Progress" value={data.inProgress} color="bg-blue-50 border-blue-200" />
@@ -81,10 +81,10 @@ export default function DashboardPage() {
               </div>
 
               {/* Completion Progress */}
-              <div className="bg-white border rounded-xl p-6 shadow-sm">
+              <div className="bg-white border rounded-xl p-4 sm:p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="font-semibold text-gray-700">Completion</h2>
-                  <span className="text-2xl font-bold text-green-600">{data.completionPercent}%</span>
+                  <span className="text-xl sm:text-2xl font-bold text-green-600">{data.completionPercent}%</span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-3">
                   <div
@@ -94,10 +94,10 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* By Status */}
-                <div className="bg-white border rounded-xl p-6 shadow-sm">
-                  <h2 className="font-semibold text-gray-700 mb-4">Issues by Status</h2>
+              <div className="bg-white border rounded-xl p-4 sm:p-6 shadow-sm">
+                <h2 className="font-semibold text-gray-700 mb-4">Issues by Status</h2>
                   <div className="space-y-3">
                     {data.byStatus.map((s) => (
                       <div key={s.status} className="flex items-center justify-between">
@@ -119,7 +119,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* By Priority */}
-                <div className="bg-white border rounded-xl p-6 shadow-sm">
+                <div className="bg-white border rounded-xl p-4 sm:p-6 shadow-sm">
                   <h2 className="font-semibold text-gray-700 mb-4">Issues by Priority</h2>
                   <div className="space-y-3">
                     {data.byPriority.map((p) => (
@@ -144,7 +144,7 @@ export default function DashboardPage() {
 
               {/* By Assignee */}
               {data.byAssignee.length > 0 && (
-                <div className="bg-white border rounded-xl p-6 shadow-sm">
+                <div className="bg-white border rounded-xl p-4 sm:p-6 shadow-sm">
                   <h2 className="font-semibold text-gray-700 mb-4">Issues by Assignee</h2>
                   <div className="space-y-3">
                     {data.byAssignee.map((a) => (
@@ -169,7 +169,7 @@ export default function DashboardPage() {
               )}
 
               {/* Recent Activity */}
-              <div className="bg-white border rounded-xl p-6 shadow-sm">
+              <div className="bg-white border rounded-xl p-4 sm:p-6 shadow-sm">
                 <h2 className="font-semibold text-gray-700 mb-4">Recent Activity</h2>
                 <div className="space-y-3">
                   {data.recentActivity.map((issue) => (
@@ -178,7 +178,7 @@ export default function DashboardPage() {
                         {issue.creator?.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-800">{issue.title}</p>
+                        <p className="text-sm font-medium text-gray-800 break-words">{issue.title}</p>
                         <p className="text-xs text-gray-400">
                           by {issue.creator?.name} • {new Date(issue.updatedAt).toLocaleDateString()}
                         </p>

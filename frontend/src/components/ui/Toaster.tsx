@@ -39,7 +39,7 @@ export default function Toaster() {
           }`}
         >
           <span className="text-base leading-none mt-0.5">{toast.type === 'error' ? '⛔' : '✅'}</span>
-          <p className="flex-1 text-sm font-medium">{toast.message}</p>
+          <p className="flex-1 text-sm font-medium break-words">{toast.message}</p>
           <button
             onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
             className={`text-sm leading-none hover:opacity-70 ${toast.type === 'error' ? 'text-red-500' : 'text-green-600'}`}

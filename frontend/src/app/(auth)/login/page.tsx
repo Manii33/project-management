@@ -9,6 +9,7 @@ import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { AuthResponse } from '@/lib/types';
 import { getErrorMessage } from '@/lib/api';
+import Logo from '@/components/Logo';
 
 
 const loginSchema = z.object({
@@ -44,15 +45,14 @@ export default function LoginPage() {
 };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-6">
       <div className="w-full max-w-md">
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">🚀 ProjectHub</h1>
-          <p className="text-gray-400 mt-2 text-sm">Project Management System</p>
+          <Logo size={40} dark={false} showText={true} />
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-white mb-1">Welcome back</h2>
           <p className="text-gray-400 text-sm mb-6">Sign in to your account</p>
 
