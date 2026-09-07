@@ -290,7 +290,7 @@ export default function ProjectsPage() {
                       <h3 className="font-semibold text-gray-800 break-words">{project.name}</h3>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[project.status]}`}>{project.status}</span>
                     </div>
-                    {project.description && <p className="text-gray-500 text-sm mt-1 line-clamp-2 break-words">{project.description}</p>}
+                    {project.description && <p className="text-gray-500 text-sm mt-1 break-words whitespace-pre-line">{project.description}</p>}
                     <p className="text-gray-400 text-xs mt-2 break-words">Owner: {project.owner?.name} • {new Date(project.createdAt).toLocaleDateString()}</p>
                   </div>
                   {isAdmin && (

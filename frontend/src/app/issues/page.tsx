@@ -154,7 +154,7 @@ export default function AllIssuesPage() {
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[issue.status]}`}>{issue.status}</span>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${PRIORITY_COLORS[issue.priority]}`}>{issue.priority}</span>
                     </div>
-                    {issue.description && <p className="text-gray-500 text-sm mt-1 line-clamp-1">{issue.description}</p>}
+                    {issue.description && <p className="text-gray-500 text-sm mt-1 break-words whitespace-pre-line">{issue.description}</p>}
                     <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 mt-2 text-xs text-gray-400">
                       <span>Assignee: {issue.assignee?.name || 'Unassigned'}</span>
                       {issue.dueDate && <span>Due: {new Date(issue.dueDate).toLocaleDateString()}</span>}

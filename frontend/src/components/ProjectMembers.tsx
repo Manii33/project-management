@@ -139,8 +139,8 @@ export default function ProjectMembers({ projectId, ownerId, isOwner }: Props) {
                 {member.user.name.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate">{member.user.name}</p>
-                <p className="text-xs text-gray-400 truncate">{member.user.email}</p>
+                <p className="text-sm font-medium text-gray-800 break-words">{member.user.name}</p>
+                <p className="text-xs text-gray-400 break-words">{member.user.email}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:ml-4 shrink-0">

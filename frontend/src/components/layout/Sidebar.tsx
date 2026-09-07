@@ -43,7 +43,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
             }`}
           >
             <span className="text-base leading-none">{item.icon}</span>
-            <span className="truncate">{item.label}</span>
+            <span className="break-words">{item.label}</span>
           </Link>
         ))}
       </nav>
