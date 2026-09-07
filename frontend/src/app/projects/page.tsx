@@ -41,36 +41,22 @@ export default function ProjectsPage() {
   const [status, setStatus] = useState<ProjectStatus>('PLANNING');
   const [formError, setFormError] = useState('');
   const [filterStatus, setFilterStatus] = useState<ProjectStatus | ''>('');
-  const [cursor, setCursor] = useState<string | undefined>(undefined);
-  const [cursorHistory, setCursorHistory] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
   const limit = 5;
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['projects', filterStatus, cursor],
+    queryKey: ['projects', filterStatus, page],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filterStatus) params.append('status', filterStatus);
-      if (cursor) params.append('cursor', cursor);
+      params.append('page', String(page));
       params.append('limit', String(limit));
       const res = await api.get<PaginatedResponse<Project>>(`/projects?${params.toString()}`);
       return res.data;
     },
   });
 
-  const goToNextPage = () => {
-    if (data?.nextCursor) {
-      setCursorHistory((prev) => [...prev, cursor ?? '']);
-      setCursor(data.nextCursor);
-    }
-  };
-
-  const goToPrevPage = () => {
-    if (cursorHistory.length > 0) {
-      const prev = cursorHistory[cursorHistory.length - 1];
-      setCursorHistory((h) => h.slice(0, -1));
-      setCursor(prev || undefined);
-    }
-  };
+  const totalPages = data ? Math.ceil(data.total / limit) : 1;
 
   const createMutation = useMutation({
     mutationFn: (d: { name: string; description: string; status: ProjectStatus }) =>
@@ -224,13 +210,13 @@ export default function ProjectsPage() {
           {/* Filter */}
           <div className="flex gap-2 mb-6 flex-wrap">
             <button
-              onClick={() => { setFilterStatus(''); setCursor(undefined); setCursorHistory([]); }}
+              onClick={() => { setFilterStatus(''); setPage(1); }}
               className={`px-3 py-2 sm:py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[44px] sm:min-h-0 ${filterStatus === '' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
             >All</button>
             {STATUSES.map((s) => (
               <button
                 key={s}
-                onClick={() => { setFilterStatus(s); setCursor(undefined); setCursorHistory([]); }}
+                onClick={() => { setFilterStatus(s); setPage(1); }}
                 className={`px-3 py-2 sm:py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[44px] sm:min-h-0 ${filterStatus === s ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
               >{s}</button>
             ))}
@@ -310,20 +296,21 @@ export default function ProjectsPage() {
           {/* Pagination */}
           {(data?.data.length ?? 0) > 0 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6">
-              <p className="text-sm text-gray-500">
-                {data?.data.length ?? 0} projects shown
+              <p className="text-sm text-gray-500 text-center sm:text-left">
+                Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, data?.total ?? 0)} of {data?.total ?? 0} projects
               </p>
               <div className="flex gap-2 w-full sm:w-auto">
                 <button
-                  onClick={goToPrevPage}
-                  disabled={cursorHistory.length === 0}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
                   className="flex-1 sm:flex-none px-4 py-2.5 sm:py-1.5 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50 min-h-[44px] sm:min-h-0"
                 >
                   Previous
                 </button>
+                <span className="px-3 py-2.5 sm:py-1.5 text-sm text-gray-600 flex items-center">{page} / {totalPages}</span>
                 <button
-                  onClick={goToNextPage}
-                  disabled={!data?.hasNextPage}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
                   className="flex-1 sm:flex-none px-4 py-2.5 sm:py-1.5 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50 min-h-[44px] sm:min-h-0"
                 >
                   Next

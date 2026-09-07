@@ -57,41 +57,27 @@ export default function IssuesPage() {
   const [filterPriority, setFilterPriority] = useState<IssuePriority | ''>('');
   const [filterAssignee, setFilterAssignee] = useState('');
   const [searchInput, setSearchInput] = useState('');
-  const [cursor, setCursor] = useState<string | undefined>(undefined);
-  const [cursorHistory, setCursorHistory] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
   const limit = 10;
   const debouncedSearch = useDebounce(searchInput, 350);
 
   // Fetch issues
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['issues', projectId, filterStatus, filterPriority, filterAssignee, debouncedSearch, cursor],
+    queryKey: ['issues', projectId, filterStatus, filterPriority, filterAssignee, debouncedSearch, page],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filterStatus) params.append('status', filterStatus);
       if (filterPriority) params.append('priority', filterPriority);
       if (filterAssignee) params.append('assigneeId', filterAssignee);
       if (debouncedSearch) params.append('search', debouncedSearch);
-      if (cursor) params.append('cursor', cursor);
+      params.append('page', String(page));
       params.append('limit', String(limit));
       const res = await api.get<PaginatedResponse<Issue>>(`/projects/${projectId}/issues?${params.toString()}`);
       return res.data;
     },
   });
 
-  const goToNextPage = () => {
-    if (data?.nextCursor) {
-      setCursorHistory((prev) => [...prev, cursor ?? '']);
-      setCursor(data.nextCursor);
-    }
-  };
-
-  const goToPrevPage = () => {
-    if (cursorHistory.length > 0) {
-      const prev = cursorHistory[cursorHistory.length - 1];
-      setCursorHistory((h) => h.slice(0, -1));
-      setCursor(prev || undefined);
-    }
-  };
+  const totalPages = data ? Math.ceil(data.total / limit) : 1;
 
   // Fetch members for assignee dropdown
   const { data: members, error: membersError } = useQuery({
@@ -241,7 +227,7 @@ export default function IssuesPage() {
           <div className="relative mb-4">
             <input
               value={searchInput}
-              onChange={(e) => { setSearchInput(e.target.value); setCursor(undefined); setCursorHistory([]); }}
+              onChange={(e) => { setSearchInput(e.target.value); setPage(1); }}
               className={inputClass}
               placeholder="🔍 Search by title, description, or assignee..."
             />
@@ -249,15 +235,15 @@ export default function IssuesPage() {
 
           {/* Filters */}
           <div className="flex gap-2 mb-4 flex-wrap items-center">
-            <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value as IssueStatus | ''); setCursor(undefined); setCursorHistory([]); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0 flex-1 sm:flex-none">
+            <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value as IssueStatus | ''); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0 flex-1 sm:flex-none">
               <option value="">All Status</option>
               {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
-            <select value={filterPriority} onChange={(e) => { setFilterPriority(e.target.value as IssuePriority | ''); setCursor(undefined); setCursorHistory([]); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0 flex-1 sm:flex-none">
+            <select value={filterPriority} onChange={(e) => { setFilterPriority(e.target.value as IssuePriority | ''); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0 flex-1 sm:flex-none">
               <option value="">All Priority</option>
               {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
-            <select value={filterAssignee} onChange={(e) => { setFilterAssignee(e.target.value); setCursor(undefined); setCursorHistory([]); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0 flex-1 sm:flex-none">
+            <select value={filterAssignee} onChange={(e) => { setFilterAssignee(e.target.value); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0 flex-1 sm:flex-none">
               <option value="">All Assignees</option>
               {membersError ? (
                 <option value="" disabled>Failed to load members</option>
@@ -272,8 +258,7 @@ export default function IssuesPage() {
                   setFilterStatus('');
                   setFilterPriority('');
                   setFilterAssignee('');
-                  setCursor(undefined);
-                  setCursorHistory([]);
+                  setPage(1);
                 }}
                 className="px-3 py-2.5 sm:py-1.5 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 min-h-[44px] sm:min-h-0 w-full sm:w-auto text-center"
               >
@@ -373,19 +358,20 @@ export default function IssuesPage() {
           {(data?.data.length ?? 0) > 0 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6">
               <p className="text-sm text-gray-500 text-center sm:text-left">
-                {data?.data.length ?? 0} issues shown
+                Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, data?.total ?? 0)} of {data?.total ?? 0} issues
               </p>
               <div className="flex gap-2 w-full sm:w-auto">
                 <button
-                  onClick={goToPrevPage}
-                  disabled={cursorHistory.length === 0}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
                   className="flex-1 sm:flex-none px-4 py-2.5 sm:py-1.5 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50 min-h-[44px] sm:min-h-0"
                 >
                   Previous
                 </button>
+                <span className="px-3 py-2.5 sm:py-1.5 text-sm text-gray-600 flex items-center">{page} / {totalPages}</span>
                 <button
-                  onClick={goToNextPage}
-                  disabled={!data?.hasNextPage}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
                   className="flex-1 sm:flex-none px-4 py-2.5 sm:py-1.5 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50 min-h-[44px] sm:min-h-0"
                 >
                   Next

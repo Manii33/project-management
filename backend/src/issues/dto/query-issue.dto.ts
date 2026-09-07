@@ -24,11 +24,6 @@ export class QueryIssueDto {
   @IsOptional()
   search?: string;
 
-  @ApiProperty({ required: false, description: 'Cursor for keyset pagination (overrides page)' })
-  @IsString()
-  @IsOptional()
-  cursor?: string;
-
   @ApiProperty({ default: 1, required: false })
   @IsInt()
   @Min(1)
