@@ -108,7 +108,7 @@ export default function KanbanPage() {
   return (
     <ProtectedRoute>
       <AppLayout>
-        <div>
+        <div className="w-full max-w-[1600px] mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
               <button
@@ -144,7 +144,7 @@ export default function KanbanPage() {
           {!isLoading && !error && allIssues.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
               <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 min-w-0 lg:min-w-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-[1600px] mx-auto">
                   {COLUMNS.map((col) => (
                   <div key={col.id} className="flex flex-col min-h-[300px] lg:min-h-96">
                     <div className={`rounded-t-xl px-4 py-3 ${col.headerColor} border border-b-0 border-gray-200`}>
