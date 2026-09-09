@@ -14,11 +14,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           staleTime: 60 * 1000,
           retry: 1,
         },
-        mutations: {
-          onError: (error) => {
-            console.error('Mutation error:', error);
-          },
-        },
       },
     })
   );
@@ -31,7 +26,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         </ErrorBoundary>
         <Toaster />
       </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 }

@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ProjectHub — Frontend
+
+Next.js (App Router) client for the ProjectHub project management system. Built with React 19, React Query, Tailwind CSS v4, `react-hook-form` + `zod`, and `@hello-pangea/dnd` for the kanban board.
+
+## Requirements
+
+- Node.js 20+
+
+## Environment Variables
+
+Copy the example file:
+
+```bash
+cp .env.example .env.local
+```
+
+| Variable               | Required | Example                        | Notes                   |
+| ---------------------- | -------- | ------------------------------ | ----------------------- |
+| `NEXT_PUBLIC_API_URL`  | **Yes**  | `http://localhost:3001/api`    | Backend API base URL    |
+
+> `NEXT_PUBLIC_*` vars are bundled into the client and are public by design — never put secrets here.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. The development server proxies API calls to the URL in `NEXT_PUBLIC_API_URL`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Common Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev      # start dev server
+npm run build    # production build
+npm run start    # start production server
+npm run lint     # eslint
+```
 
-## Learn More
+## Project Layout
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app/` — routes (App Router)
+- `src/components/` — shared & feature components
+- `src/context/AuthContext.tsx` — session state
+- `src/lib/api.ts` — Axios client (JWT, 401 handling, errors)
+- `src/lib/constants.ts` — shared status/priority constants
+- `src/lib/types.ts` — shared TypeScript types
+- `src/lib/hooks/` — hooks (`useRole`, `useDebounce`, …)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The JWT is stored in `localStorage`. Confirm the backend is running and `NEXT_PUBLIC_API_URL` matches before exporting to production.
