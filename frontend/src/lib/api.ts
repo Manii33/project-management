@@ -54,8 +54,6 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    console.error('API Error:', serverMessage || 'Something went wrong');
-
     // Auth pages apni inline errors dikhati hain — wahan toast noise nahi chahiye
     if (!url.startsWith('/auth/') && status) {
       let message = serverMessage || 'Something went wrong. Please try again.';

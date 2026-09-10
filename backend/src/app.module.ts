@@ -8,7 +8,6 @@ import { ProjectsModule } from './projects/projects.module';
 import { ProjectMembersModule } from './project-members/project-members.module';
 import { IssuesModule } from './issues/issues.module';
 import { CommentsModule } from './comments/comments.module';
-import databaseConfig from './config/database.config';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ActivityModule } from './activity/activity.module';
 
@@ -16,7 +15,6 @@ import { ActivityModule } from './activity/activity.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

@@ -10,83 +10,9 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { useRole } from '@/lib/hooks/useRole';
 import { useDebounce } from '@/lib/hooks/useDebounce';
+import { STATUS_COLORS, PRIORITY_COLORS, STATUSES, PRIORITIES } from '@/lib/constants';
 
-const STATUS_COLORS: Record<IssueStatus, string> = {
-  TODO: 'bg-slate-100 text-slate-600 dark:bg-slate-500/15 dark:text-slate-300',
-  IN_PROGRESS: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300',
-  IN_REVIEW: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300',
-  DONE: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300',
-};
-
-const STATUS_ACCENTS: Record<IssueStatus, string> = {
-  TODO: 'bg-slate-400',
-  IN_PROGRESS: 'bg-indigo-500',
-  IN_REVIEW: 'bg-amber-400',
-  DONE: 'bg-emerald-500',
-};
-
-const PRIORITY_COLORS: Record<IssuePriority, string> = {
-  LOW: 'text-slate-400 dark:text-zinc-500',
-  MEDIUM: 'text-indigo-600 dark:text-indigo-300',
-  HIGH: 'text-orange-600 dark:text-orange-300',
-  URGENT: 'text-red-600 dark:text-red-400',
-};
-
-const PRIORITY_DOTS: Record<IssuePriority, string> = {
-  LOW: 'bg-slate-400',
-  MEDIUM: 'bg-indigo-500',
-  HIGH: 'bg-orange-500',
-  URGENT: 'bg-red-500',
-};
-
-const LABEL_COLORS: Record<IssuePriority, string> = {
-  LOW: 'bg-slate-100 text-slate-600 dark:bg-slate-500/15 dark:text-slate-300',
-  MEDIUM: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300',
-  HIGH: 'bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300',
-  URGENT: 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300',
-};
-
-const LABEL_NAMES: Record<IssuePriority, string> = {
-  LOW: 'Low priority',
-  MEDIUM: 'Medium priority',
-  HIGH: 'High priority',
-  URGENT: 'Critical',
-};
-
-const STATUS_TABS: { key: '' | IssueStatus; label: string }[] = [
-  { key: '', label: 'All' },
-  { key: 'TODO', label: 'Open' },
-  { key: 'IN_PROGRESS', label: 'In Progress' },
-  { key: 'IN_REVIEW', label: 'In Review' },
-  { key: 'DONE', label: 'Done' },
-];
-
-const PRIORITY_TABS: { key: '' | IssuePriority; label: string }[] = [
-  { key: '', label: 'All priorities' },
-  { key: 'URGENT', label: 'Critical' },
-  { key: 'HIGH', label: 'High' },
-  { key: 'MEDIUM', label: 'Medium' },
-  { key: 'LOW', label: 'Low' },
-];
-
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const sec = Math.floor(diff / 1000);
-  if (sec < 60) return `${sec} sec ago`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min} min ago`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr} hr ago`;
-  const day = Math.floor(hr / 24);
-  if (day < 30) return `${day} day${day !== 1 ? 's' : ''} ago`;
-  return new Date(dateStr).toLocaleDateString();
-}
-
-const tabClass =
-  'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer';
-
-const activeTabClass = 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 shadow-sm';
-const inactiveTabClass = 'text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-200';
+const inputClass = 'w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400';
 
 export default function AllIssuesPage() {
   const router = useRouter();

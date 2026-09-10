@@ -17,28 +17,19 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           staleTime: 60 * 1000,
           retry: 1,
         },
-        mutations: {
-          onError: (error) => {
-            console.error('Mutation error:', error);
-          },
-        },
       },
     })
   );
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <DateRangeProvider>
-            <ExportProvider>
-              <ErrorBoundary>{children}</ErrorBoundary>
-              <Toaster />
-            </ExportProvider>
-          </DateRangeProvider>
-        </AuthProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </ThemeProvider>
+      <AuthProvider>
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
+        <Toaster />
+      </AuthProvider>
+      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 }
