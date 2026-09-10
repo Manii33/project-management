@@ -10,9 +10,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { useRole } from '@/lib/hooks/useRole';
 import { useDebounce } from '@/lib/hooks/useDebounce';
-import { STATUS_COLORS, PRIORITY_COLORS, STATUSES, PRIORITIES } from '@/lib/constants';
-
-const inputClass = 'w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400';
+import { STATUS_COLORS, PRIORITY_COLORS, STATUS_TABS, PRIORITY_TABS, tabClass, activeTabClass, inactiveTabClass, STATUS_ACCENTS, PRIORITY_DOTS, LABEL_COLORS, LABEL_NAMES, timeAgo } from '@/lib/constants';
 
 export default function AllIssuesPage() {
   const router = useRouter();

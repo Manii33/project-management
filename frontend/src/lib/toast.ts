@@ -14,6 +14,10 @@ export function showErrorToast(message: string) {
   showToast('error', message);
 }
 
+export function showSuccessToast(message: string) {
+  showToast('success', message);
+}
+
 export interface ToastPayload {
   type: ToastType;
   message: string;
