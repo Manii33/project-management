@@ -9,6 +9,7 @@ import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { AuthResponse } from '@/lib/types';
 import { getErrorMessage } from '@/lib/api';
+import Logo from '@/components/Logo';
 
 
 const loginSchema = z.object({
@@ -52,8 +53,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">🚀 ProjectHub</h1>
-          <p className="text-gray-400 mt-2 text-sm">Project Management System</p>
+          <Logo size={44} showText={true} />
         </div>
 
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">

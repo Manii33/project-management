@@ -5,6 +5,7 @@ import { useRole } from '@/lib/hooks/useRole';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Project, Issue } from '@/lib/types';
+import Logo from '@/components/Logo';
 
 const PROJECT_DOTS: Record<string, string> = {
   ACTIVE: 'bg-indigo-400',
@@ -63,9 +64,7 @@ export default function Sidebar() {
       <div className="px-5 pt-6 pb-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-violet-500/25">
-              P
-            </div>
+            <Logo size={36} showText={false} dark={false} />
             <span className="text-[15px] font-semibold text-slate-800 dark:text-zinc-100 tracking-tight">ProjectHub</span>
           </div>
           <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-violet-50 text-violet-500 dark:bg-zinc-800 dark:text-zinc-400">

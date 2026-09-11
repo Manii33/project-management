@@ -5,6 +5,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import ExportDropdown from '@/components/layout/ExportDropdown';
 import DateRangeToggle from '@/components/layout/DateRangeToggle';
+import Logo from '@/components/Logo';
 
 const PAGE_TITLES: Record<string, string> = {
   '/': 'Overview',
@@ -30,22 +31,25 @@ export default function Header() {
 
   return (
     <header className="h-14 shrink-0 border-b border-violet-100/80 bg-white/80 backdrop-blur flex items-center justify-between px-6 lg:px-8 dark:border-zinc-800/80 dark:bg-[#0a0a0b]/95">
-      <nav className="flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
-        <Link
-          href="/"
-          className={`transition-colors ${isHome ? 'text-violet-700 font-semibold dark:text-zinc-100' : 'text-slate-400 hover:text-violet-600 dark:text-zinc-500 dark:hover:text-zinc-300'}`}
-        >
-          {isHome ? 'Overview' : 'Home'}
-        </Link>
-        {!isHome && (
-          <>
-            <span className="text-violet-200 dark:text-zinc-700">/</span>
-            <Link href={pathname} className="text-slate-800 font-semibold dark:text-zinc-100">
-              {title}
-            </Link>
-          </>
-        )}
-      </nav>
+      <div className="flex items-center gap-3">
+        <Logo size={28} showText={false} dark={false} />
+        <nav className="flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
+          <Link
+            href="/"
+            className={`transition-colors ${isHome ? 'text-violet-700 font-semibold dark:text-zinc-100' : 'text-slate-400 hover:text-violet-600 dark:text-zinc-500 dark:hover:text-zinc-300'}`}
+          >
+            {isHome ? 'Overview' : 'Home'}
+          </Link>
+          {!isHome && (
+            <>
+              <span className="text-violet-200 dark:text-zinc-700">/</span>
+              <Link href={pathname} className="text-slate-800 font-semibold dark:text-zinc-100">
+                {title}
+              </Link>
+            </>
+          )}
+        </nav>
+      </div>
 
       <div className="flex items-center gap-2">
         <DateRangeToggle />
