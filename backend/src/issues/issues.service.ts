@@ -96,31 +96,31 @@ export class IssuesService {
     const { status, priority, assigneeId, search, page = 1, limit = 10 } = query;
 
     const qb = this.issuesRepository
-  .createQueryBuilder('issue')
-  .leftJoinAndSelect('issue.creator', 'creator')
-  .leftJoinAndSelect('issue.assignee', 'assignee')
-  .select([
-    'issue.id',
-    'issue.title',
-    'issue.order',
-    'issue.description',
-    'issue.status',
-    'issue.priority',
-    'issue.dueDate',
-    'issue.createdAt',
-    'issue.updatedAt',
-    'creator.id',
-    'creator.name',
-    'creator.email',
-    'creator.role',
-    'assignee.id',
-    'assignee.name',
-    'assignee.email',
-    'assignee.role',
-  ])
-  .where('issue.project = :projectId', { projectId })
-  .orderBy('issue.order', 'ASC')
-  .addOrderBy('issue.createdAt', 'DESC');
+      .createQueryBuilder('issue')
+      .leftJoinAndSelect('issue.creator', 'creator')
+      .leftJoinAndSelect('issue.assignee', 'assignee')
+      .select([
+        'issue.id',
+        'issue.title',
+        'issue.order',
+        'issue.description',
+        'issue.status',
+        'issue.priority',
+        'issue.dueDate',
+        'issue.createdAt',
+        'issue.updatedAt',
+        'creator.id',
+        'creator.name',
+        'creator.email',
+        'creator.role',
+        'assignee.id',
+        'assignee.name',
+        'assignee.email',
+        'assignee.role',
+      ])
+      .where('issue.project = :projectId', { projectId })
+      .orderBy('issue.order', 'ASC')
+      .addOrderBy('issue.createdAt', 'DESC');
 
     if (status) qb.andWhere('issue.status = :status', { status });
     if (priority) qb.andWhere('issue.priority = :priority', { priority });

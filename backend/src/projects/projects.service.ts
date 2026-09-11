@@ -28,7 +28,8 @@ export class ProjectsService {
   async findAll(query: QueryProjectDto): Promise<{ data: Project[]; total: number; page: number; limit: number }> {
     const { status, page = 1, limit = 10 } = query;
 
-    const qb = this.projectsRepository.createQueryBuilder('project')
+    const qb = this.projectsRepository
+      .createQueryBuilder('project')
       .leftJoinAndSelect('project.owner', 'owner')
       .leftJoinAndSelect('project.createdBy', 'createdBy')
       .select([

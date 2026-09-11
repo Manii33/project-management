@@ -26,8 +26,8 @@ export default class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return this.props.fallback || (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="bg-white border rounded-xl p-8 max-w-md text-center shadow-sm">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+          <div className="bg-white border rounded-xl p-6 sm:p-8 max-w-md text-center shadow-sm w-full">
             <div className="text-4xl mb-4">⚠️</div>
             <h2 className="text-lg font-semibold text-gray-800 mb-2">Something went wrong</h2>
             <p className="text-gray-500 text-sm mb-4">
@@ -35,7 +35,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             </p>
             <button
               onClick={() => this.setState({ hasError: false })}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+              className="bg-blue-600 text-white px-4 py-2.5 sm:py-2 rounded-lg text-sm hover:bg-blue-700 min-h-[44px] sm:min-h-0"
             >
               Try Again
             </button>
