@@ -1,4 +1,4 @@
-# ProjectHub — Project Management System
+# Project & Issue Management System — Project Management System
 
 A full-stack, Jira-like project management system built with **NestJS** (backend), **PostgreSQL** (database), and **Next.js / React** (frontend).
 

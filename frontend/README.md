@@ -1,6 +1,6 @@
-# ProjectHub — Frontend
+# Project & Issue Management System — Frontend
 
-Next.js (App Router) client for the ProjectHub project management system. Built with React 19, React Query, Tailwind CSS v4, `react-hook-form` + `zod`, and `@hello-pangea/dnd` for the kanban board.
+Next.js (App Router) client for the Project & Issue Management System. Built with React 19, React Query, Tailwind CSS v4, `react-hook-form` + `zod`, and `@hello-pangea/dnd` for the kanban board.
 
 ## Requirements
 

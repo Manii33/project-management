@@ -19,4 +19,11 @@ export class IssuesGlobalController {
     const isAdmin = req.user.role === UserRole.ADMIN;
     return this.issuesService.findAllGlobal(query, req.user.id, isAdmin);
   }
+
+  @Get('all')
+  @ApiOperation({ summary: 'Get the complete issue dataset across projects the user belongs to (unpaginated, for analytics)' })
+  findAllAll(@Request() req: AuthenticatedRequest) {
+    const isAdmin = req.user.role === UserRole.ADMIN;
+    return this.issuesService.findAllGlobalAll(req.user.id, isAdmin);
+  }
 }

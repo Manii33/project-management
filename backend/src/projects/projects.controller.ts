@@ -43,6 +43,12 @@ export class ProjectsController {
     return this.projectsService.findAll(query);
   }
 
+  @Get('all')
+  @ApiOperation({ summary: 'Get the complete project dataset (unpaginated, for analytics)' })
+  findAllAll() {
+    return this.projectsService.findAllAll();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get project by id' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {

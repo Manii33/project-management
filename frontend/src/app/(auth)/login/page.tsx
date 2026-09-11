@@ -14,7 +14,7 @@ import Logo from '@/components/Logo';
 
 const loginSchema = z.object({
   email: z.string().email('Valid email required'),
-  password: z.string().min(1, 'Password is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -49,14 +49,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-6">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
 
         <div className="text-center mb-8">
-          <Logo size={40} dark={false} showText={true} />
+          <Logo size={44} showText={true} />
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
           <h2 className="text-xl font-semibold text-white mb-1">Welcome back</h2>
           <p className="text-gray-400 text-sm mb-6">Sign in to your account</p>
 

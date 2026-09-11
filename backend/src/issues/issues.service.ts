@@ -176,6 +176,30 @@ export class IssuesService {
     return { data, total, page, limit };
   }
 
+  async findAllGlobalAll(userId: string, isAdmin = false): Promise<Issue[]> {
+    let projectIds: string[] | null = null;
+    if (!isAdmin) {
+      const memberships = await this.membersRepository.find({
+        where: { user: { id: userId } },
+        relations: { project: true },
+      });
+      projectIds = memberships.map((m) => m.project.id);
+      if (projectIds.length === 0) return [];
+    }
+
+    const qb = this.issuesRepository
+      .createQueryBuilder('issue')
+      .leftJoinAndSelect('issue.project', 'project')
+      .leftJoinAndSelect('issue.creator', 'creator')
+      .leftJoinAndSelect('issue.assignee', 'assignee')
+      .select(ISSUE_WITH_PROJECT_SELECT)
+      .orderBy('issue.createdAt', 'DESC');
+
+    if (!isAdmin) qb.where('issue.project IN (:...projectIds)', { projectIds });
+
+    return qb.getMany();
+  }
+
   async findOne(id: string, userId: string, isAdmin = false): Promise<Issue> {
     const issue = await this.issuesRepository
       .createQueryBuilder('issue')

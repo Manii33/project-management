@@ -10,6 +10,7 @@ interface LogoProps {
 export default function Logo({ size = 32, className = '', showText = true, dark = true }: LogoProps) {
   const textColor = dark ? 'text-white' : 'text-gray-800';
   const subColor = dark ? 'text-gray-400' : 'text-gray-500';
+  const gradId = React.useId();
 
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
@@ -22,12 +23,12 @@ export default function Logo({ size = 32, className = '', showText = true, dark 
         className="flex-shrink-0"
       >
         <defs>
-          <linearGradient id="ph-grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <linearGradient id={gradId} x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
             <stop stopColor="#6366F1" />
             <stop offset="1" stopColor="#818CF8" />
           </linearGradient>
         </defs>
-        <rect width="40" height="40" rx="10" fill="url(#ph-grad)" />
+        <rect width="40" height="40" rx="10" fill={`url(#${gradId})`} />
         <path
           d="M12 13.5C12 12.12 13.12 11 14.5 11H20C21.38 11 22.5 12.12 22.5 13.5V20C22.5 21.38 21.38 22.5 20 22.5H14.5C13.12 22.5 12 21.38 12 20V13.5Z"
           fill="white"
@@ -45,8 +46,8 @@ export default function Logo({ size = 32, className = '', showText = true, dark 
       </svg>
       {showText && (
         <div className="leading-tight">
-          <p className={`text-base font-bold tracking-tight ${textColor}`}>ProjectHub</p>
-          <p className={`text-[10px] font-medium ${subColor} -mt-0.5`}>Project Management</p>
+          <p className={`text-base font-bold tracking-tight ${textColor}`}>Project & Issue</p>
+          <p className={`text-[10px] font-medium ${subColor} -mt-0.5`}>Management System</p>
         </div>
       )}
     </div>

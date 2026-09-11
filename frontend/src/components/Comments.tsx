@@ -9,7 +9,7 @@ import LoadingSpinner from './ui/LoadingSpinner';
 import ErrorMessage from './ui/ErrorMessage';
 import ConfirmModal from './ui/ConfirmModal';
 
-const inputClass = 'w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400';
+const inputClass = 'w-full bg-white text-gray-900 dark:bg-slate-800 dark:text-slate-100 border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 dark:placeholder-slate-500';
 
 export default function Comments({ issueId }: { issueId: string }) {
   const { user } = useAuth();
@@ -77,7 +77,7 @@ export default function Comments({ issueId }: { issueId: string }) {
 
   return (
     <div className="mt-6">
-      <h2 className="font-semibold text-gray-700 mb-4">Comments</h2>
+      <h2 className="font-semibold text-gray-700 dark:text-slate-100 mb-4">Comments</h2>
 
       {formError && <div className="mb-3"><ErrorMessage message={formError} /></div>}
 
@@ -103,7 +103,7 @@ export default function Comments({ issueId }: { issueId: string }) {
       {isLoading && <LoadingSpinner size="sm" />}
       {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
       {!isLoading && !error && comments?.length === 0 && (
-        <p className="text-gray-400 text-sm text-center py-4">No comments yet</p>
+        <p className="text-gray-400 dark:text-slate-500 text-sm text-center py-4">No comments yet</p>
       )}
 
       {/* Comments List */}
@@ -113,14 +113,14 @@ export default function Comments({ issueId }: { issueId: string }) {
             <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold shrink-0">
               {c.author?.name?.charAt(0).toUpperCase() || '?'}
             </div>
-            <div className="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-3">
+            <div className="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-3 dark:bg-slate-800 dark:border-slate-700">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium text-gray-800 text-sm">{c.author?.name}</span>
+                  <span className="font-medium text-gray-800 dark:text-slate-100 text-sm">{c.author?.name}</span>
                   {c.author?.role === UserRole.ADMIN && (
-                    <span className="px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 text-[10px] font-medium uppercase">Admin</span>
+                    <span className="px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 text-[10px] font-medium uppercase dark:bg-purple-500/15 dark:text-purple-300">Admin</span>
                   )}
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400 dark:text-slate-500">
                     {new Date(c.createdAt).toLocaleString()}
                   </span>
                 </div>
@@ -167,7 +167,7 @@ export default function Comments({ issueId }: { issueId: string }) {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap break-words">{c.content}</p>
+                <p className="text-sm text-gray-700 dark:text-slate-200 mt-1 whitespace-pre-wrap break-words">{c.content}</p>
               )}
             </div>
           </div>
