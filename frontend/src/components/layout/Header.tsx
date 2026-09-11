@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import ExportDropdown from '@/components/layout/ExportDropdown';
 import DateRangeToggle from '@/components/layout/DateRangeToggle';
 import Logo from '@/components/Logo';
+import { APP_NAME } from '@/lib/constants';
 
 const PAGE_TITLES: Record<string, string> = {
   '/': 'Overview',
@@ -25,7 +26,7 @@ export default function Header() {
   const title =
     Object.entries(PAGE_TITLES).find(([key]) =>
       key === '/' ? pathname === '/' : pathname.startsWith(key)
-    )?.[1] || 'ProjectHub';
+    )?.[1] || APP_NAME;
 
   const isHome = pathname === '/';
 

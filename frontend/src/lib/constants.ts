@@ -1,5 +1,7 @@
 import { IssueStatus, IssuePriority } from './types';
 
+export const APP_NAME = 'Project & Issue Management System';
+
 export const STATUS_COLORS: Record<IssueStatus, string> = {
   TODO: 'bg-gray-100 text-gray-600',
   IN_PROGRESS: 'bg-blue-100 text-blue-700',

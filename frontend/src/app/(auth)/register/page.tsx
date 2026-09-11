@@ -10,6 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { AuthResponse } from '@/lib/types';
 import { getErrorMessage } from '@/lib/api';
 import Logo from '@/components/Logo';
+import { APP_NAME } from '@/lib/constants';
 
 
 const registerSchema = z.object({
@@ -53,7 +54,7 @@ export default function RegisterPage() {
 
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
           <h2 className="text-xl font-semibold text-white mb-1">Create account</h2>
-          <p className="text-gray-400 text-sm mb-6">Join ProjectHub today</p>
+          <p className="text-gray-400 text-sm mb-6">Join {APP_NAME} today</p>
 
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg mb-5 text-sm">

@@ -1,6 +1,6 @@
-# ProjectHub — Backend API
+# Project & Issue Management System — Backend API
 
-NestJS backend for the ProjectHub project management system. Exposes a REST API under the `/api` prefix, with JWT authentication, role-based authorization, PostgreSQL persistence via TypeORM, and auto-generated Swagger documentation.
+NestJS backend for the Project & Issue Management System. Exposes a REST API under the `/api` prefix, with JWT authentication, role-based authorization, PostgreSQL persistence via TypeORM, and auto-generated Swagger documentation.
 
 ---
 

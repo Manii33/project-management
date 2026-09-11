@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Project, Issue } from '@/lib/types';
 import Logo from '@/components/Logo';
+import { APP_NAME } from '@/lib/constants';
 
 const PROJECT_DOTS: Record<string, string> = {
   ACTIVE: 'bg-indigo-400',
@@ -65,7 +66,7 @@ export default function Sidebar() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Logo size={36} showText={false} dark={false} />
-            <span className="text-[15px] font-semibold text-slate-800 dark:text-zinc-100 tracking-tight">ProjectHub</span>
+            <span className="text-[15px] font-semibold text-slate-800 dark:text-zinc-100 tracking-tight">{APP_NAME}</span>
           </div>
           <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-violet-50 text-violet-500 dark:bg-zinc-800 dark:text-zinc-400">
             v1.0

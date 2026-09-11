@@ -46,8 +46,8 @@ export default function Logo({ size = 32, className = '', showText = true, dark 
       </svg>
       {showText && (
         <div className="leading-tight">
-          <p className={`text-base font-bold tracking-tight ${textColor}`}>ProjectHub</p>
-          <p className={`text-[10px] font-medium ${subColor} -mt-0.5`}>Project Management</p>
+          <p className={`text-base font-bold tracking-tight ${textColor}`}>Project & Issue</p>
+          <p className={`text-[10px] font-medium ${subColor} -mt-0.5`}>Management System</p>
         </div>
       )}
     </div>
