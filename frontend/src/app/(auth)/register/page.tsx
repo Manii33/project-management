@@ -9,12 +9,21 @@ import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { AuthResponse } from '@/lib/types';
 import { getErrorMessage } from '@/lib/api';
+import Logo from '@/components/Logo';
 
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Valid email required'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(128, 'Password must be at most 128 characters')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/\d/, 'Password must contain at least one number')
+    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
+    .regex(/^\S+$/, 'Password must not contain spaces'),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -44,14 +53,13 @@ export default function RegisterPage() {
 };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">🚀 ProjectHub</h1>
-          <p className="text-gray-400 mt-2 text-sm">Project Management System</p>
+          <Logo size={40} dark={false} showText={true} />
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-white mb-1">Create account</h2>
           <p className="text-gray-400 text-sm mb-6">Join ProjectHub today</p>
 

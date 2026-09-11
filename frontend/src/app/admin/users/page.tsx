@@ -47,12 +47,12 @@ export default function AdminUsersPage() {
     <ProtectedRoute>
       <AppLayout>
         <div className="max-w-4xl">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-800">Admin Panel</h1>
               <p className="text-sm text-gray-500 mt-1">Manage user roles across the system</p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+            <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium self-start">
               {users?.filter((u) => u.role === UserRole.ADMIN).length || 0} Admin(s)
             </span>
           </div>
@@ -61,8 +61,9 @@ export default function AdminUsersPage() {
           {error && <ErrorMessage message="Failed to load users" />}
 
           {!isLoading && users && (
-            <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-              <table className="w-full text-sm text-left">
+            <div className="bg-white border rounded-xl shadow-sm overflow-visible">
+              <div className="overflow-x-auto no-scrollbar">
+                <table className="w-full text-sm text-left min-w-[540px]">
                 <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
                   <tr>
                     <th className="px-4 py-3">User</th>
@@ -112,6 +113,7 @@ export default function AdminUsersPage() {
                   })}
                 </tbody>
               </table>
+              </div>
 
               {actionError && (
                 <div className="px-4 py-3 bg-red-50 border-t border-red-100 text-red-600 text-sm">
@@ -122,7 +124,7 @@ export default function AdminUsersPage() {
           )}
 
           {!isLoading && !error && users?.length === 0 && (
-            <div className="bg-white border rounded-xl p-12 text-center">
+            <div className="bg-white border rounded-xl p-6 sm:p-12 text-center">
               <p className="text-gray-400 text-sm">No users found</p>
             </div>
           )}

@@ -53,7 +53,7 @@ export default function ActivityLog({ projectId }: Props) {
   if (isLoading) return <LoadingSpinner size="sm" />;
 
   return (
-    <div className="bg-white border rounded-xl p-6 shadow-sm mt-4">
+    <div className="bg-white border rounded-xl p-4 sm:p-6 shadow-sm mt-4">
       <h2 className="font-semibold text-gray-700 mb-4">Recent Activity</h2>
 
       {activities?.length === 0 && (
@@ -63,11 +63,11 @@ export default function ActivityLog({ projectId }: Props) {
       <div className="space-y-3">
         {activities?.map((activity) => (
           <div key={activity.id} className="flex items-start gap-3 py-2 border-b border-gray-100 last:border-0">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
               {activity.user?.name.charAt(0).toUpperCase()}
             </div>
-            <div className="flex-1">
-              <p className="text-sm text-gray-700">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-gray-700 break-words">
                 <span className="font-medium">{activity.user?.name}</span>{' '}
                 {getActivityMessage(activity)}
               </p>

@@ -61,6 +61,8 @@ export default function IssuesPage() {
     },
   });
 
+  const totalPages = data ? Math.ceil(data.total / limit) : 1;
+
   // Fetch members for assignee dropdown
   const { data: members, error: membersError } = useQuery({
     queryKey: ['members', projectId],
@@ -144,37 +146,35 @@ export default function IssuesPage() {
     }
   };
 
-  const totalPages = data ? Math.ceil(data.total / limit) : 1;
-
   // Issue Detail View
   if (selectedIssue) {
     return (
       <ProtectedRoute>
         <AppLayout>
           <div className="max-w-2xl">
-            <button onClick={() => setSelectedIssue(null)} className="text-sm text-gray-500 hover:text-gray-700 mb-4">
+            <button onClick={() => setSelectedIssue(null)} className="text-sm text-gray-500 hover:text-gray-700 mb-4 px-2 py-2">
               ← Back to Issues
             </button>
-            <div className="bg-white border rounded-xl p-6 shadow-sm">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h1 className="text-xl font-bold text-gray-800">{selectedIssue.title}</h1>
+            <div className="bg-white border rounded-xl p-4 sm:p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-xl font-bold text-gray-800 break-words">{selectedIssue.title}</h1>
                   <div className="flex gap-2 mt-2">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[selectedIssue.status]}`}>{selectedIssue.status}</span>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${PRIORITY_COLORS[selectedIssue.priority]}`}>{selectedIssue.priority}</span>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={() => handleEdit(selectedIssue)} className="text-sm text-blue-600 border border-blue-200 px-3 py-1 rounded-lg hover:bg-blue-50">Edit</button>
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => handleEdit(selectedIssue)} className="text-sm text-blue-600 border border-blue-200 px-3 py-2 sm:py-1 rounded-lg hover:bg-blue-50 min-h-[40px] sm:min-h-0">Edit</button>
                   {selectedIssue.creator?.id === user?.id && (
-                    <button onClick={() => setConfirmDelete(selectedIssue.id)} className="text-sm text-red-600 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50">Delete</button>
+                    <button onClick={() => setConfirmDelete(selectedIssue.id)} className="text-sm text-red-600 border border-red-200 px-3 py-2 sm:py-1 rounded-lg hover:bg-red-50 min-h-[40px] sm:min-h-0">Delete</button>
                   )}
                 </div>
               </div>
-              <div className="space-y-3 text-sm text-gray-600">
-                <p><span className="font-medium text-gray-700">Description:</span> {selectedIssue.description || 'No description'}</p>
-                <p><span className="font-medium text-gray-700">Assignee:</span> {selectedIssue.assignee?.name || 'Unassigned'}</p>
-                <p><span className="font-medium text-gray-700">Creator:</span> {selectedIssue.creator?.name}</p>
+              <div className="space-y-3 text-sm text-gray-600 break-words">
+                <p className="break-words"><span className="font-medium text-gray-700">Description:</span> {selectedIssue.description || 'No description'}</p>
+                <p className="break-words"><span className="font-medium text-gray-700">Assignee:</span> {selectedIssue.assignee?.name || 'Unassigned'}</p>
+                <p className="break-words"><span className="font-medium text-gray-700">Creator:</span> {selectedIssue.creator?.name}</p>
                 <p><span className="font-medium text-gray-700">Due Date:</span> {selectedIssue.dueDate ? new Date(selectedIssue.dueDate).toLocaleDateString() : 'No due date'}</p>
                 <p><span className="font-medium text-gray-700">Created:</span> {new Date(selectedIssue.createdAt).toLocaleDateString()}</p>
               </div>
@@ -200,9 +200,9 @@ export default function IssuesPage() {
       <AppLayout>
         <div className="max-w-4xl">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <h1 className="text-2xl font-bold text-gray-800">Issues</h1>
-            <button onClick={() => { resetForm(); setShowForm(true); }} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+            <button onClick={() => { resetForm(); setShowForm(true); }} className="bg-blue-600 text-white px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium hover:bg-blue-700 min-h-[44px] sm:min-h-0 w-full sm:w-auto">
               + New Issue
             </button>
           </div>
@@ -219,15 +219,15 @@ export default function IssuesPage() {
 
           {/* Filters */}
           <div className="flex gap-2 mb-4 flex-wrap items-center">
-            <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value as IssueStatus | ''); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value as IssueStatus | ''); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0 flex-1 sm:flex-none">
               <option value="">All Status</option>
               {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
-            <select value={filterPriority} onChange={(e) => { setFilterPriority(e.target.value as IssuePriority | ''); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select value={filterPriority} onChange={(e) => { setFilterPriority(e.target.value as IssuePriority | ''); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0 flex-1 sm:flex-none">
               <option value="">All Priority</option>
               {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
-            <select value={filterAssignee} onChange={(e) => { setFilterAssignee(e.target.value); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select value={filterAssignee} onChange={(e) => { setFilterAssignee(e.target.value); setPage(1); }} className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-0 flex-1 sm:flex-none">
               <option value="">All Assignees</option>
               {membersError ? (
                 <option value="" disabled>Failed to load members</option>
@@ -244,7 +244,7 @@ export default function IssuesPage() {
                   setFilterAssignee('');
                   setPage(1);
                 }}
-                className="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50"
+                className="px-3 py-2.5 sm:py-1.5 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 min-h-[44px] sm:min-h-0 w-full sm:w-auto text-center"
               >
                 ✕ Reset Filters
               </button>
@@ -253,7 +253,7 @@ export default function IssuesPage() {
 
           {/* Form */}
           {showForm && (
-            <div className="bg-white border rounded-xl p-6 mb-6 shadow-sm">
+              <div className="bg-white border rounded-xl p-4 sm:p-6 mb-6 shadow-sm">
               <h2 className="font-semibold text-gray-700 mb-4">{editIssue ? 'Edit Issue' : 'Create New Issue'}</h2>
               {formError && <ErrorMessage message={formError} />}
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -265,7 +265,7 @@ export default function IssuesPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                   <textarea value={description} onChange={(e) => setDescription(e.target.value)} className={inputClass} placeholder="Issue description" rows={3} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                     <select value={status} onChange={(e) => setStatus(e.target.value as IssueStatus)} className={inputClass}>
@@ -279,7 +279,7 @@ export default function IssuesPage() {
                     </select>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
                     <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={inputClass} />
@@ -292,11 +292,11 @@ export default function IssuesPage() {
                     </select>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="bg-blue-600 text-white px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 min-h-[44px] sm:min-h-0">
                     {editIssue ? 'Update' : 'Create'}
                   </button>
-                  <button type="button" onClick={resetForm} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">Cancel</button>
+                  <button type="button" onClick={resetForm} className="bg-gray-100 text-gray-700 px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium hover:bg-gray-200 min-h-[44px] sm:min-h-0">Cancel</button>
                 </div>
               </form>
             </div>
@@ -306,7 +306,7 @@ export default function IssuesPage() {
           {isLoading && <LoadingSpinner />}
           {error && <ErrorMessage message={getErrorMessage(error)} onRetry={() => refetch()} />}
           {!isLoading && data?.data.length === 0 && (
-            <div className="bg-white border rounded-xl p-12 text-center">
+              <div className="bg-white border rounded-xl p-6 sm:p-12 text-center">
               <p className="text-gray-400 text-sm">No issues found</p>
             </div>
           )}
@@ -322,12 +322,12 @@ export default function IssuesPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-gray-800">{issue.title}</h3>
+                      <h3 className="font-semibold text-gray-800 break-words">{issue.title}</h3>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[issue.status]}`}>{issue.status}</span>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${PRIORITY_COLORS[issue.priority]}`}>{issue.priority}</span>
                     </div>
-                    {issue.description && <p className="text-gray-500 text-sm mt-1 line-clamp-1">{issue.description}</p>}
-                    <div className="flex gap-4 mt-2 text-xs text-gray-400">
+                    {issue.description && <p className="text-gray-500 text-sm mt-1 break-words whitespace-pre-line">{issue.description}</p>}
+                    <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 mt-2 text-xs text-gray-400">
                       <span>Assignee: {issue.assignee?.name || 'Unassigned'}</span>
                       {issue.dueDate && <span>Due: {new Date(issue.dueDate).toLocaleDateString()}</span>}
                       <span>By: {issue.creator?.name}</span>
@@ -339,13 +339,27 @@ export default function IssuesPage() {
           </div>
 
           {/* Pagination */}
-          {data && data.total > limit && (
-            <div className="flex items-center justify-between mt-6">
-              <p className="text-sm text-gray-500">Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, data.total)} of {data.total}</p>
-              <div className="flex gap-2">
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50">Previous</button>
-                <span className="px-3 py-1.5 text-sm text-gray-600">{page} / {totalPages}</span>
-                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1.5 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50">Next</button>
+          {(data?.data.length ?? 0) > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6">
+              <p className="text-sm text-gray-500 text-center sm:text-left">
+                Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, data?.total ?? 0)} of {data?.total ?? 0} issues
+              </p>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="flex-1 sm:flex-none px-4 py-2.5 sm:py-1.5 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50 min-h-[44px] sm:min-h-0"
+                >
+                  Previous
+                </button>
+                <span className="px-3 py-2.5 sm:py-1.5 text-sm text-gray-600 flex items-center">{page} / {totalPages}</span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="flex-1 sm:flex-none px-4 py-2.5 sm:py-1.5 text-sm border rounded-lg disabled:opacity-50 hover:bg-gray-50 min-h-[44px] sm:min-h-0"
+                >
+                  Next
+                </button>
               </div>
             </div>
           )}
