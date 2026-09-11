@@ -10,7 +10,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { useRole } from '@/lib/hooks/useRole';
 import { useDebounce } from '@/lib/hooks/useDebounce';
-import { STATUS_COLORS, PRIORITY_COLORS, STATUS_TABS, PRIORITY_TABS, tabClass, activeTabClass, inactiveTabClass, STATUS_ACCENTS, PRIORITY_DOTS, LABEL_COLORS, LABEL_NAMES, timeAgo } from '@/lib/constants';
+import { STATUS_COLORS, PRIORITY_COLORS, STATUS_TABS, PRIORITY_TABS, tabClass, activeTabClass, inactiveTabClass, STATUS_ACCENTS, PRIORITY_DOTS, timeAgo } from '@/lib/constants';
 
 export default function AllIssuesPage() {
   const router = useRouter();
@@ -134,14 +134,13 @@ export default function AllIssuesPage() {
           {!isLoading && !error && data && data.data.length > 0 && (
             <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden">
               {/* Header row */}
-              <div className="hidden lg:grid grid-cols-[minmax(280px,2.2fr)_1fr_1fr_1fr_1fr_0.9fr_0.9fr] items-center gap-4 px-6 py-3 bg-slate-50 dark:bg-zinc-800/50 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-zinc-500 border-b border-slate-200/80 dark:border-zinc-800">
+              <div className="hidden lg:grid grid-cols-[minmax(280px,2.2fr)_1fr_1fr_1fr_1fr_0.9fr] items-center gap-4 px-6 py-3 bg-slate-50 dark:bg-zinc-800/50 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-zinc-500 border-b border-slate-200/80 dark:border-zinc-800">
                 <span>Title</span>
                 <span>Status</span>
                 <span>Priority</span>
                 <span>Project</span>
                 <span>Assignee</span>
                 <span>Updated</span>
-                <span>Label</span>
               </div>
 
               <div className="divide-y divide-slate-100 dark:divide-zinc-800">
@@ -152,7 +151,7 @@ export default function AllIssuesPage() {
                     <div
                       key={issue.id}
                       onClick={() => router.push(`/projects/${issue.project.id}/issues`)}
-                      className="grid grid-cols-1 lg:grid-cols-[minmax(280px,2.2fr)_1fr_1fr_1fr_1fr_0.9fr_0.9fr] items-center gap-4 px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                      className="grid grid-cols-1 lg:grid-cols-[minmax(280px,2.2fr)_1fr_1fr_1fr_1fr_0.9fr] items-center gap-4 px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
                     >
                       {/* Title + ID */}
                       <div className="min-w-0">
@@ -172,7 +171,7 @@ export default function AllIssuesPage() {
 
                       {/* Priority */}
                       <div>
-                        <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${PRIORITY_COLORS[issue.priority]}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${PRIORITY_COLORS[issue.priority]}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${PRIORITY_DOTS[issue.priority]}`} />
                           {issue.priority}
                         </span>
@@ -200,13 +199,6 @@ export default function AllIssuesPage() {
                       {/* Updated */}
                       <div>
                         <span className="text-sm text-slate-500 dark:text-zinc-400">{timeAgo(issue.updatedAt)}</span>
-                      </div>
-
-                      {/* Label */}
-                      <div>
-                        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${LABEL_COLORS[issue.priority]}`}>
-                          {LABEL_NAMES[issue.priority]}
-                        </span>
                       </div>
                     </div>
                   );
