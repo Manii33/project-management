@@ -23,12 +23,18 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
-        <Toaster />
-      </AuthProvider>
+      <ThemeProvider>
+        <ExportProvider>
+          <DateRangeProvider>
+            <AuthProvider>
+              <ErrorBoundary>
+                {children}
+              </ErrorBoundary>
+              <Toaster />
+            </AuthProvider>
+          </DateRangeProvider>
+        </ExportProvider>
+      </ThemeProvider>
       {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
