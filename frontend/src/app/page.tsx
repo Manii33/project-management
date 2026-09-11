@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useExportData } from '@/lib/export-context';
 import { useDateRange, DATE_RANGE_LABELS } from '@/lib/date-range-context';
 import { rangeStartDate } from '@/lib/date';
-import { Issue, Project, PaginatedResponse, UserRole } from '@/lib/types';
+import { Issue, Project, UserRole } from '@/lib/types';
 
 const METRIC_META: Record<string, { tint: string; bar: string; gradient: string; iconBg: string; iconColor: string; sub: string }> = {
   'Open Issues': {
@@ -306,7 +306,7 @@ export default function HomePage() {
   const { data: issuesData } = useQuery({
     queryKey: ['overview', 'issues'],
     queryFn: async () => {
-      const res = await api.get<PaginatedResponse<Issue>>('/issues?limit=1000');
+      const res = await api.get<Issue[]>('/issues/all');
       return res.data;
     },
   });
@@ -314,21 +314,22 @@ export default function HomePage() {
   const { data: projectsData } = useQuery({
     queryKey: ['overview', 'projects'],
     queryFn: async () => {
-      const res = await api.get<PaginatedResponse<Project>>('/projects?page=1&limit=100');
+      const res = await api.get<Project[]>('/projects/all');
       return res.data;
     },
   });
 
-  const issues = useMemo(() => issuesData?.data ?? [], [issuesData]);
-  const projects = useMemo(() => projectsData?.data ?? [], [projectsData]);
+  const issues = useMemo(() => issuesData ?? [], [issuesData]);
+  const projects = useMemo(() => projectsData ?? [], [projectsData]);
 
   const filteredIssues = useMemo(() => {
     const start = rangeStartDate(range);
     if (!start) return issues;
     const s = start.getTime();
     return issues.filter((i) => {
-      const t = new Date(i.createdAt).getTime();
-      return t >= s;
+      const created = new Date(i.createdAt).getTime();
+      const updated = new Date(i.updatedAt).getTime();
+      return created >= s || updated >= s;
     });
   }, [issues, range]);
 

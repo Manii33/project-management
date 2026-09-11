@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useRole } from '@/lib/hooks/useRole';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { Project, Issue, PaginatedResponse } from '@/lib/types';
+import { Project, Issue } from '@/lib/types';
 
 const PROJECT_DOTS: Record<string, string> = {
   ACTIVE: 'bg-indigo-400',
@@ -27,7 +27,7 @@ export default function Sidebar() {
   const { data: projects } = useQuery({
     queryKey: ['sidebar', 'projects'],
     queryFn: async () => {
-      const res = await api.get<PaginatedResponse<Project>>('/projects?page=1&limit=100');
+      const res = await api.get<Project[]>('/projects/all');
       return res.data;
     },
   });
@@ -35,19 +35,19 @@ export default function Sidebar() {
   const { data: issues } = useQuery({
     queryKey: ['sidebar', 'issues'],
     queryFn: async () => {
-      const res = await api.get<PaginatedResponse<Issue>>('/issues?limit=1000');
+      const res = await api.get<Issue[]>('/issues/all');
       return res.data;
     },
   });
 
   const openCounts = new Map<string, number>();
-  issues?.data.forEach((i) => {
+  issues?.forEach((i) => {
     if (i.status !== 'DONE') {
       openCounts.set(i.project.id, (openCounts.get(i.project.id) ?? 0) + 1);
     }
   });
 
-  const projectsToShow = (projects?.data ?? []).slice(0, 6);
+  const projectsToShow = (projects ?? []).slice(0, 6);
 
   const activeClass =
     'bg-violet-500/10 text-violet-700 dark:bg-zinc-800/70 dark:text-white dark:border-indigo-400';
@@ -124,7 +124,7 @@ export default function Sidebar() {
       <div className="flex-1 overflow-y-auto px-3 mt-6">
         <div className="flex items-center justify-between px-2 mb-1.5">
           <p className="text-[11px] font-medium uppercase tracking-wider text-violet-400 dark:text-zinc-500">Projects</p>
-          <span className="text-[10px] text-violet-400 dark:text-zinc-600 font-medium">{projects?.total ?? 0}</span>
+          <span className="text-[10px] text-violet-400 dark:text-zinc-600 font-medium">{projects?.length ?? 0}</span>
         </div>
         <div className="space-y-0.5">
           {projectsToShow.map((p) => {

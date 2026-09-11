@@ -1,4 +1,4 @@
-import { IsOptional, IsEnum, IsInt, Min } from 'class-validator';
+import { IsOptional, IsEnum, IsInt, Min, Max } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ProjectStatus } from '../project.entity';
@@ -19,6 +19,7 @@ export class QueryProjectDto {
   @ApiProperty({ default: 10, required: false })
   @IsInt()
   @Min(1)
+  @Max(100)
   @IsOptional()
   @Type(() => Number)
   limit?: number = 10;

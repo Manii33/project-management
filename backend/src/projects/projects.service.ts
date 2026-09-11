@@ -62,6 +62,31 @@ export class ProjectsService {
     return { data, total, page, limit };
   }
 
+  async findAllAll(): Promise<Project[]> {
+    return this.projectsRepository
+      .createQueryBuilder('project')
+      .leftJoinAndSelect('project.owner', 'owner')
+      .leftJoinAndSelect('project.createdBy', 'createdBy')
+      .select([
+        'project.id',
+        'project.name',
+        'project.description',
+        'project.status',
+        'project.createdAt',
+        'project.updatedAt',
+        'owner.id',
+        'owner.name',
+        'owner.email',
+        'owner.role',
+        'createdBy.id',
+        'createdBy.name',
+        'createdBy.email',
+        'createdBy.role',
+      ])
+      .orderBy('project.createdAt', 'DESC')
+      .getMany();
+  }
+
   async findOne(id: string): Promise<Project> {
     const project = await this.projectsRepository.findOne({
       where: { id },
